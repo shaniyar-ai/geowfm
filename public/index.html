@@ -423,6 +423,7 @@ input:checked+.tog-sl:before{transform:translateX(19px);}
       </div>
       <div class="fg"><label>Yangi parol (ixtiyoriy)</label><input type="password" id="eu-pass" placeholder="Bo'sh qoldiring"></div>
     </div>
+    <div class="fg"><label>Telefon</label><input type="tel" id="eu-phone" placeholder="+998 90 000 00 00"></div>
     <div class="mf">
       <button class="btn btn-s" onclick="closeModal('editUserModal')">Bekor</button>
       <button class="btn btn-p" onclick="saveEditUser()">💾 Saqlash</button>
@@ -689,6 +690,7 @@ function openEditUser(u) {
   document.getElementById('eu-name').value = u.name;
   document.getElementById('eu-pos').value  = u.position||'';
   document.getElementById('eu-pass').value = '';
+  document.getElementById('eu-phone').value = u.phone||'';
   // Set role
   const rs = document.getElementById('eu-role');
   [...rs.options].forEach(o => o.selected = o.value===u.role);
@@ -709,6 +711,7 @@ async function saveEditUser() {
     group_name: document.getElementById('eu-group').value,
     role:       document.getElementById('eu-role').value,
     status:     document.getElementById('eu-status').value,
+    phone:      document.getElementById('eu-phone').value,
   };
   const pass = document.getElementById('eu-pass').value;
   if (pass) body.password = pass;
