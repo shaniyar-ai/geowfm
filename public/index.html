@@ -296,7 +296,7 @@ input:checked+.tog-sl:before{transform:translateX(19px);}
             <div class="fg"><label>Nomi</label><input type="text" value="GeoWFM Corp"></div>
             <div class="fg"><label>Ish boshlanish</label><input type="time" value="09:00"></div>
             <div class="fg"><label>Ish tugash</label><input type="time" value="18:00"></div>
-            <div class="fg"><label>API URL</label><input type="text" id="apiUrlInput" value="http://localhost:3000/api"></div>
+            <div class="fg"><label>API URL</label><input type="text" id="apiUrlInput" value="https://geowfm-production.up.railway.app/api"></div>
             <button class="btn btn-p" onclick="saveSettings()">💾 Saqlash</button>
           </div>
           <div class="card" style="padding:20px">
@@ -456,7 +456,7 @@ input:checked+.tog-sl:before{transform:translateX(19px);}
 
 <script>
 // ─── Config ─────────────────────────────────────────────────
-let API = localStorage.getItem('apiUrl') || 'http://localhost:3000/api';
+let API = localStorage.getItem('apiUrl') || 'https://geowfm-production.up.railway.app/api';
 let TOKEN = localStorage.getItem('token') || '';
 let ME = JSON.parse(localStorage.getItem('me') || 'null');
 let checkedIn = false;
