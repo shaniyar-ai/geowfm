@@ -7,4 +7,4 @@
 3. Deploy!
 
 ## Default Login
-- admin@geo.uz / 1234
+- sh.xaytbayev@geo.uz / 1234
