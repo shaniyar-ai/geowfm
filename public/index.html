@@ -143,7 +143,7 @@ input:checked+.tog-sl:before{transform:translateX(19px);}
     <div class="demo-hint">
       <b>sh.xaytbayev@geo.uz</b> / 1234 — Bosh Admin<br>
       <b>sh.teshaboyev@geo.uz</b> / 1234 — Admin<br>
-      <b>a.muratov@geo.uz</b> / 1234 — Nazoratchi
+      <b>a.muratov@geo.uz</b> / 1234 — Elektromontyor
     </div>
   </div>
 </div>
@@ -206,12 +206,12 @@ input:checked+.tog-sl:before{transform:translateX(19px);}
           <button class="btn btn-p" onclick="savePermissions()">💾 Saqlash</button>
         </div>
         <div style="display:flex;gap:9px;margin-bottom:18px">
-          <button class="btn btn-del" id="pt-supervisor" onclick="switchPermTab('supervisor')">🔶 Nazoratchi</button>
+          <button class="btn btn-del" id="pt-supervisor" onclick="switchPermTab('supervisor')">🔶 Admin</button>
           <button class="btn btn-s" id="pt-worker" onclick="switchPermTab('worker')" style="opacity:.5">👷 Ishchi</button>
         </div>
         <div id="permPanel-supervisor">
           <div class="card">
-            <div class="ch"><h3>🔶 Nazoratchi ruxsatlari</h3></div>
+            <div class="ch"><h3>🔶 Admin ruxsatlari</h3></div>
             <table class="perm-table">
               <thead><tr><th>Funksiya</th><th>Ruxsat</th></tr></thead>
               <tbody>
@@ -227,7 +227,7 @@ input:checked+.tog-sl:before{transform:translateX(19px);}
         </div>
         <div id="permPanel-worker" style="display:none">
           <div class="card">
-            <div class="ch"><h3>👷 Ishchi ruxsatlari</h3></div>
+            <div class="ch"><h3>⚡ Elektromontyor ruxsatlari</h3></div>
             <table class="perm-table">
               <thead><tr><th>Funksiya</th><th>Ruxsat</th></tr></thead>
               <tbody>
@@ -312,7 +312,7 @@ input:checked+.tog-sl:before{transform:translateX(19px);}
 
       <!-- SUPERVISOR DASHBOARD -->
       <div class="page" id="page-supDashboard">
-        <div class="ph"><div><h2>🔶 Nazoratchi Paneli</h2><p id="supGroup">—</p></div>
+        <div class="ph"><div><h2>🔶 Admin Paneli</h2><p id="supGroup">—</p></div>
           <button class="btn btn-p" onclick="openModal('addTaskModal')">+ Vazifa</button>
         </div>
         <div class="sg">
@@ -372,8 +372,8 @@ input:checked+.tog-sl:before{transform:translateX(19px);}
       <div class="fg"><label>Parol</label><input type="password" id="nu-pass" placeholder="Kamida 4 belgi"></div>
       <div class="fg"><label>Rol</label>
         <select id="nu-role" onchange="updateRoleDesc()">
-          <option value="worker">👷 Ishchi</option>
-          <option value="supervisor">🔶 Nazoratchi</option>
+          <option value="worker">⚡ Elektromontyor</option>
+          <option value="supervisor">🔶 Admin</option>
           <option value="admin">👑 Admin</option>
         </select>
       </div>
@@ -388,7 +388,7 @@ input:checked+.tog-sl:before{transform:translateX(19px);}
     </div>
     <div class="fg"><label>Telefon</label><input type="tel" id="nu-phone" placeholder="+998 90 000 00 00"></div>
     <div style="background:var(--surface2);border-radius:9px;padding:12px;font-size:13px;color:var(--text2);line-height:1.6" id="roleDescBox">
-      👷 Ishchi: Faqat o'z vazifalari va davomat.
+      ⚡ Elektromontyor: Faqat o'z vazifalari va davomat.
     </div>
     <div class="mf">
       <button class="btn btn-s" onclick="closeModal('addUserModal')">Bekor</button>
@@ -405,8 +405,8 @@ input:checked+.tog-sl:before{transform:translateX(19px);}
       <div class="fg"><label>Ism Familiya</label><input type="text" id="eu-name"></div>
       <div class="fg"><label>Rol</label>
         <select id="eu-role">
-          <option value="worker">👷 Ishchi</option>
-          <option value="supervisor">🔶 Nazoratchi</option>
+          <option value="worker">⚡ Elektromontyor</option>
+          <option value="supervisor">🔶 Admin</option>
           <option value="admin">👑 Admin</option>
         </select>
       </div>
@@ -512,11 +512,11 @@ const NAVS = {
 };
 
 const ROLE_COLORS = {admin:'av-r',supervisor:'av-o',worker:'av-g'};
-const ROLE_LABELS = {admin:'👑 Admin',supervisor:'🔶 Nazoratchi',worker:'👷 Ishchi'};
+const ROLE_LABELS = {admin:'👑 Bosh Admin',supervisor:'🔶 Admin',worker:'⚡ Elektromontyor'};
 const ROLE_HOME   = {admin:'dashboard',supervisor:'supDashboard',worker:'workerHome'};
 const ROLE_DESC   = {
-  worker:     '👷 Ishchi: Faqat o\'z vazifalari va davomat.',
-  supervisor: '🔶 Nazoratchi: O\'z guruhini kuzatadi, vazifa beradi.',
+  worker:     '⚡ Elektromontyor: Faqat o\'z vazifalari va davomat.',
+  supervisor: '🔶 Admin: O\'z guruhini kuzatadi, vazifa beradi.',
   admin:      '👑 Admin: Barcha huquqlarga ega.',
 };
 const AVCOLORS = ['av-g','av-b','av-p','av-o','av-r'];
