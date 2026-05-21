@@ -84,11 +84,11 @@ async function start() {
   if (get('SELECT COUNT(*) as c FROM users').c == 0) {
     const h = p => bcrypt.hashSync(p, 10);
     [
-      ['Shoniyor Xaytbayev','sh.xaytbayev@geo.uz',h('1234'),'admin','Direktor','Boshqaruv'],
-      ['Nodir Admin','nazoratchi@geo.uz',h('1234'),'supervisor','Rahbar','Guruh A'],
-      ['Alisher Karimov','alisher@geo.uz',h('1234'),'worker','Inspektor','Guruh A'],
-      ['Bobur Yusupov','bobur@geo.uz',h('1234'),'worker','Vakil','Guruh B'],
-      ['Kamola Nazarova','kamola@geo.uz',h('1234'),'worker','Buxgalter','Guruh A'],
+      ['Shoniyor Xaytbayev','sh.xaytbayev@geo.uz',h('1234'),'admin','Bosh admin','MTT guruhi'],
+      ['Shukur Teshaboyev','sh.teshaboyev@geo.uz',h('1234'),'supervisor','Rahbar','MTT gurugi'],
+      ['Aydar Muratov','a.muratov@geo.uz',h('1234'),'worker','Nazoratchi','MTT guruhi'],
+      ['Ergali Murzafarov','e.murzafarov@geo.uz',h('1234'),'worker','Nazoratchi','MTT guruhi'],
+      ['Aziz Umurbayev','a.umurbayev@geo.uz',h('1234'),'worker','Nazoratchi','MTT guruhi'],
     ].forEach(u => run('INSERT OR IGNORE INTO users (name,email,password,role,position,group_name) VALUES (?,?,?,?,?,?)', u));
 
     [
