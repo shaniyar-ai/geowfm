@@ -90,7 +90,7 @@ async function start() {
     [
       ['Shoniyor Xaytbayev','sh.xaytbayev@geo.uz',h('1234'),'admin','Bosh Admin','Rahbariyat'],
       ['Shukur Teshaboyev','sh.teshaboyev@geo.uz',h('1234'),'supervisor','Rahbar','Rahbariyat'],
-      ['Aydar Muratov','a.muratov@geo.uz',h('1234'),'worker','Nazoratchi','Xodimlar'],
+      ['Aydar Muratov','a.muratov@geo.uz',h('1234'),'worker','Elektromontyor','Xodimlar'],
     ].forEach(u => run('INSERT OR IGNORE INTO users (name,email,password,role,position,group_name) VALUES (?,?,?,?,?,?)', u));
 
     [
