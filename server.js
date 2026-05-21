@@ -81,11 +81,12 @@ async function start() {
     UNIQUE(role, permission)
   )`);
 
-  if (get('SELECT COUNT(*) as c FROM users').c == 0) {
+  if (!get('SELECT id FROM users WHERE email=?', ['sh.xaytbayev@geo.uz'])) {
+    run('DELETE FROM users');
     const h = p => bcrypt.hashSync(p, 10);
     [
       ['Shoniyor Xaytbayev','sh.xaytbayev@geo.uz',h('1234'),'admin','Bosh admin','MTT guruhi'],
-      ['Shukur Teshaboyev','sh.teshaboyev@geo.uz',h('1234'),'supervisor','Rahbar','MTT gurugi'],
+      ['Shukur Teshaboyev','sh.teshaboyev@geo.uz',h('1234'),'supervisor','Rahbar','MTT guruhi'],
       ['Aydar Muratov','a.muratov@geo.uz',h('1234'),'worker','Nazoratchi','MTT guruhi'],
       ['Ergali Murzafarov','e.murzafarov@geo.uz',h('1234'),'worker','Nazoratchi','MTT guruhi'],
       ['Aziz Umurbayev','a.umurbayev@geo.uz',h('1234'),'worker','Nazoratchi','MTT guruhi'],
