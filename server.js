@@ -81,15 +81,16 @@ async function start() {
     UNIQUE(role, permission)
   )`);
 
-  if (!get('SELECT id FROM users WHERE email=?', ['sh.xaytbayev@geo.uz'])) {
+  // Har doim foydalanuvchilarni tekshir va yangilat
+  const adminExists = get('SELECT id FROM users WHERE email=?', ['sh.xaytbayev@geo.uz']);
+  const oldUser = get('SELECT id FROM users WHERE email=?', ['admin@geo.uz']);
+  if (!adminExists || oldUser) {
     run('DELETE FROM users');
     const h = p => bcrypt.hashSync(p, 10);
     [
-      ['Shoniyor Xaytbayev','sh.xaytbayev@geo.uz',h('1234'),'admin','Bosh admin','MTT guruhi'],
-      ['Shukur Teshaboyev','sh.teshaboyev@geo.uz',h('1234'),'supervisor','Rahbar','MTT guruhi'],
-      ['Aydar Muratov','a.muratov@geo.uz',h('1234'),'worker','Nazoratchi','MTT guruhi'],
-      ['Ergali Murzafarov','e.murzafarov@geo.uz',h('1234'),'worker','Nazoratchi','MTT guruhi'],
-      ['Aziz Umurbayev','a.umurbayev@geo.uz',h('1234'),'worker','Nazoratchi','MTT guruhi'],
+      ['Shoniyor Xaytbayev','sh.xaytbayev@geo.uz',h('1234'),'admin','Bosh Admin','Rahbariyat'],
+      ['Shukur Teshaboyev','sh.teshaboyev@geo.uz',h('1234'),'supervisor','Rahbar','Rahbariyat'],
+      ['Aydar Muratov','a.muratov@geo.uz',h('1234'),'worker','Nazoratchi','Xodimlar'],
     ].forEach(u => run('INSERT OR IGNORE INTO users (name,email,password,role,position,group_name) VALUES (?,?,?,?,?,?)', u));
 
     [
