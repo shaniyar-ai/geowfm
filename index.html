@@ -1,0 +1,1278 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GeoWFM</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0a0e1a;--surface:#111827;--surface2:#1a2235;--border:#1e2d45;--accent:#00d4ff;--accent2:#7c3aed;--success:#10b981;--warning:#f59e0b;--danger:#ef4444;--text:#e2e8f0;--text2:#94a3b8;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+#loginPage{min-height:100vh;display:flex;align-items:center;justify-content:center;background:radial-gradient(ellipse at 30% 20%,rgba(0,212,255,.08),transparent 60%),radial-gradient(ellipse at 70% 80%,rgba(124,58,237,.08),transparent 60%),var(--bg);}
+.login-box{background:var(--surface);border:1px solid var(--border);border-radius:24px;padding:44px;width:420px;max-width:95vw;box-shadow:0 0 60px rgba(0,0,0,.5);}
+@keyframes slideUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+.login-box{animation:slideUp .5s ease;}
+.logo{display:flex;align-items:center;gap:12px;margin-bottom:28px;}
+.logo-icon{width:46px;height:46px;border-radius:13px;background:linear-gradient(135deg,var(--accent),var(--accent2));display:flex;align-items:center;justify-content:center;font-size:21px;}
+.logo h1{font-family:'Syne',sans-serif;font-size:26px;font-weight:800;}
+.logo span{color:var(--accent);}
+.fg{margin-bottom:15px;}
+.fg label{display:block;font-size:11px;color:var(--text2);margin-bottom:6px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;}
+.fg input,.fg select{width:100%;padding:12px 14px;background:var(--surface2);border:1px solid var(--border);border-radius:10px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;outline:none;transition:border-color .2s;}
+.fg input:focus,.fg select:focus{border-color:var(--accent);}
+.btn-login{width:100%;padding:13px;border-radius:11px;border:none;cursor:pointer;background:linear-gradient(135deg,var(--accent),#0099cc);color:#000;font-family:'Syne',sans-serif;font-size:15px;font-weight:700;transition:all .2s;margin-top:6px;}
+.btn-login:hover{transform:translateY(-2px);box-shadow:0 8px 25px rgba(0,212,255,.3);}
+.err-msg{color:var(--danger);font-size:13px;text-align:center;margin-top:12px;display:none;}
+.demo-hint{text-align:center;margin-top:14px;font-size:12px;color:var(--text2);line-height:1.9;}
+.demo-hint b{color:var(--accent);}
+#app{display:none;}
+.layout{display:flex;min-height:100vh;}
+.sidebar{width:235px;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;height:100vh;top:0;left:0;z-index:100;transition:transform .3s;}
+.sb-logo{padding:20px 18px;border-bottom:1px solid var(--border);}
+.sb-logo h2{font-family:'Syne',sans-serif;font-size:19px;font-weight:800;}
+.sb-logo h2 span{color:var(--accent);}
+.sb-logo p{font-size:11px;color:var(--text2);margin-top:2px;}
+.sb-nav{flex:1;padding:12px 10px;overflow-y:auto;}
+.nav-sec{margin-bottom:18px;}
+.nav-lbl{font-size:10px;font-weight:600;color:var(--text2);letter-spacing:1px;text-transform:uppercase;padding:0 8px;margin-bottom:5px;}
+.nav-item{display:flex;align-items:center;gap:9px;padding:9px 11px;border-radius:9px;cursor:pointer;color:var(--text2);transition:all .2s;margin-bottom:2px;font-size:13px;font-weight:500;}
+.nav-item:hover{background:var(--surface2);color:var(--text);}
+.nav-item.active{background:rgba(0,212,255,.1);color:var(--accent);}
+.nav-item .ic{font-size:16px;width:19px;text-align:center;}
+.sb-bottom{padding:13px;border-top:1px solid var(--border);}
+.user-card{display:flex;align-items:center;gap:9px;}
+.uav{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0;}
+.uinfo h4{font-size:13px;font-weight:600;}
+.uinfo p{font-size:11px;color:var(--text2);}
+.btn-logout{margin-top:9px;width:100%;padding:7px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--text2);cursor:pointer;font-size:13px;transition:all .2s;}
+.btn-logout:hover{border-color:var(--danger);color:var(--danger);}
+.main{margin-left:235px;flex:1;padding:26px;}
+.page{display:none;animation:slideUp .3s ease;}
+.page.active{display:block;}
+.ph{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:24px;}
+.ph h2{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;}
+.ph p{color:var(--text2);font-size:13px;margin-top:3px;}
+.ha{display:flex;gap:9px;align-items:center;}
+.sg{display:grid;grid-template-columns:repeat(4,1fr);gap:13px;margin-bottom:22px;}
+.sc{background:var(--surface);border:1px solid var(--border);border-radius:13px;padding:17px;transition:all .2s;position:relative;overflow:hidden;}
+.sc::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--accent),var(--accent2));}
+.sc:hover{border-color:rgba(0,212,255,.3);transform:translateY(-2px);}
+.sc .si{font-size:24px;margin-bottom:9px;}
+.sc .sv{font-family:'Syne',sans-serif;font-size:24px;font-weight:800;margin-bottom:3px;}
+.sc .sl{font-size:12px;color:var(--text2);}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:13px;overflow:hidden;margin-bottom:18px;}
+.ch{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;}
+.ch h3{font-family:'Syne',sans-serif;font-size:14px;font-weight:700;}
+table{width:100%;border-collapse:collapse;}
+th{padding:10px 17px;font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;text-align:left;background:var(--surface2);}
+td{padding:12px 17px;font-size:13px;border-top:1px solid var(--border);vertical-align:middle;}
+tr:hover td{background:rgba(255,255,255,.02);}
+.badge{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:20px;font-size:11px;font-weight:600;}
+.badge.success{background:rgba(16,185,129,.15);color:var(--success);}
+.badge.warning{background:rgba(245,158,11,.15);color:var(--warning);}
+.badge.danger{background:rgba(239,68,68,.15);color:var(--danger);}
+.badge.info{background:rgba(0,212,255,.15);color:var(--accent);}
+.badge.purple{background:rgba(124,58,237,.15);color:#a78bfa;}
+.badge.ra{background:rgba(239,68,68,.15);color:#f87171;border:1px solid rgba(239,68,68,.3);}
+.badge.rs{background:rgba(245,158,11,.15);color:#fbbf24;border:1px solid rgba(245,158,11,.3);}
+.badge.rw{background:rgba(16,185,129,.15);color:#34d399;border:1px solid rgba(16,185,129,.3);}
+.btn{padding:7px 15px;border-radius:8px;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;transition:all .2s;display:inline-flex;align-items:center;gap:5px;}
+.btn-p{background:linear-gradient(135deg,var(--accent),#0099cc);color:#000;}
+.btn-p:hover{transform:translateY(-1px);box-shadow:0 4px 15px rgba(0,212,255,.3);}
+.btn-s{background:var(--surface2);color:var(--text);border:1px solid var(--border);}
+.btn-s:hover{border-color:var(--accent);color:var(--accent);}
+.btn-ok{background:rgba(16,185,129,.15);color:var(--success);border:1px solid rgba(16,185,129,.3);}
+.btn-del{background:rgba(239,68,68,.15);color:var(--danger);border:1px solid rgba(239,68,68,.3);}
+.btn-warn{background:rgba(245,158,11,.15);color:var(--warning);border:1px solid rgba(245,158,11,.3);}
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:1000;align-items:center;justify-content:center;backdrop-filter:blur(4px);}
+.modal-overlay.open{display:flex;}
+.modal{background:var(--surface);border:1px solid var(--border);border-radius:17px;padding:26px;width:480px;max-width:96vw;max-height:92vh;overflow-y:auto;animation:slideUp .3s ease;}
+.modal h3{font-family:'Syne',sans-serif;font-size:17px;font-weight:700;margin-bottom:18px;}
+.mf{display:flex;gap:9px;justify-content:flex-end;margin-top:18px;}
+.ir{display:grid;grid-template-columns:1fr 1fr;gap:11px;}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.mb18{margin-bottom:18px;}
+.av-r{background:rgba(239,68,68,.2);color:#f87171;}
+.av-o{background:rgba(245,158,11,.2);color:var(--warning);}
+.av-g{background:rgba(16,185,129,.2);color:var(--success);}
+.av-b{background:rgba(0,212,255,.2);color:var(--accent);}
+.av-p{background:rgba(124,58,237,.2);color:#a78bfa;}
+.loading{text-align:center;padding:32px;color:var(--text2);font-size:14px;}
+.empty{text-align:center;padding:40px;color:var(--text2);}
+#toast{position:fixed;bottom:20px;right:20px;background:var(--surface);border:1px solid var(--border);border-radius:11px;padding:12px 17px;font-size:14px;z-index:9999;display:none;box-shadow:0 8px 30px rgba(0,0,0,.5);max-width:280px;}
+.mob-toggle{display:none;position:fixed;top:13px;left:13px;z-index:200;background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:8px;cursor:pointer;font-size:18px;}
+.checkin-card{background:linear-gradient(135deg,rgba(0,212,255,.05),rgba(124,58,237,.05));border:1px solid rgba(0,212,255,.2);border-radius:17px;padding:22px;text-align:center;margin-bottom:18px;}
+.ci-time{font-family:'Syne',sans-serif;font-size:46px;font-weight:800;color:var(--accent);letter-spacing:-2px;}
+.ci-date{font-size:13px;color:var(--text2);margin-bottom:13px;}
+.ci-status{display:inline-flex;align-items:center;gap:7px;padding:6px 16px;border-radius:20px;font-size:13px;font-weight:600;margin-bottom:18px;}
+.ci-status.in{background:rgba(16,185,129,.15);color:var(--success);}
+.ci-status.out{background:rgba(239,68,68,.15);color:var(--danger);}
+.ci-btn{width:86px;height:86px;border-radius:50%;border:none;cursor:pointer;font-size:28px;transition:all .3s;margin:0 auto;display:block;}
+.ci-btn.go{background:linear-gradient(135deg,var(--success),#059669);box-shadow:0 0 24px rgba(16,185,129,.3);}
+.ci-btn.stop{background:linear-gradient(135deg,var(--danger),#dc2626);box-shadow:0 0 24px rgba(239,68,68,.3);}
+.ci-btn:hover{transform:scale(1.1);}
+.task-item{padding:13px 17px;border-top:1px solid var(--border);display:flex;align-items:center;gap:13px;}
+.task-item:hover{background:var(--surface2);}
+.tp{width:4px;height:36px;border-radius:3px;flex-shrink:0;}
+.ti{flex:1;}
+.tt{font-size:13px;font-weight:500;margin-bottom:3px;}
+.tm{font-size:11px;color:var(--text2);display:flex;gap:9px;}
+.perm-table th{padding:11px 15px;font-size:11px;color:var(--text2);text-transform:uppercase;background:var(--surface2);text-align:left;}
+.perm-table td{padding:11px 15px;border-top:1px solid var(--border);font-size:13px;}
+.toggle-sw{position:relative;width:40px;height:21px;display:inline-block;}
+.toggle-sw input{opacity:0;width:0;height:0;}
+.tog-sl{position:absolute;inset:0;background:#374151;border-radius:21px;cursor:pointer;transition:.3s;}
+.tog-sl:before{content:'';position:absolute;height:15px;width:15px;left:3px;bottom:3px;background:#fff;border-radius:50%;transition:.3s;}
+input:checked+.tog-sl{background:var(--accent);}
+input:checked+.tog-sl:before{transform:translateX(19px);}
+@media(max-width:768px){.sidebar{transform:translateX(-100%)}.sidebar.open{transform:translateX(0)}.main{margin-left:0;padding:14px}.sg{grid-template-columns:1fr 1fr}.g2{grid-template-columns:1fr}.mob-toggle{display:block}.ph{flex-direction:column;gap:11px}}
+::-webkit-scrollbar{width:5px;}::-webkit-scrollbar-track{background:var(--surface);}::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="loginPage">
+  <div class="login-box">
+    <div class="logo"><div class="logo-icon">🌐</div><h1>Geo<span>WFM</span></h1></div>
+    <div class="fg"><label>Email</label><input type="email" id="lEmail" value="sh.xaytbayev@geo.uz"></div>
+    <div class="fg"><label>Parol</label><input type="password" id="lPass" value="1234" onkeydown="if(event.key==='Enter')doLogin()"></div>
+    <button class="btn-login" onclick="doLogin()">Kirish →</button>
+    <div class="err-msg" id="loginErr">Email yoki parol noto'g'ri!</div>
+    <div class="demo-hint">
+      <b>sh.xaytbayev@geo.uz / 1234 — Bosh Admin<br>
+      <b>nazoratchi@geo.uz / 1234 — Admin<br>
+      <b>alisher@geo.uz / 1234 — Nazoratchi
+    </div>
+  </div>
+</div>
+
+<button class="mob-toggle" onclick="document.getElementById('sidebar').classList.toggle('open')">☰</button>
+
+<!-- APP -->
+<div id="app">
+  <div class="layout">
+    <aside class="sidebar" id="sidebar">
+      <div class="sb-logo"><h2>Geo<span>WFM</span></h2><p id="sbSub">—</p></div>
+      <nav class="sb-nav" id="sbNav"></nav>
+      <div class="sb-bottom">
+        <div class="user-card">
+          <div class="uav av-b" id="sbAv">A</div>
+          <div class="uinfo"><h4 id="sbName">—</h4><p id="sbRole">—</p></div>
+        </div>
+        <button class="btn-logout" onclick="doLogout()">🚪 Chiqish</button>
+      </div>
+    </aside>
+
+    <main class="main">
+
+      <!-- DASHBOARD -->
+      <div class="page" id="page-dashboard">
+        <div class="ph"><div><h2>📊 Dashboard</h2><p id="dashDate">—</p></div>
+          <div class="ha"><button class="btn btn-s" onclick="loadDashboard()">🔄 Yangilash</button><button class="btn btn-p" onclick="openModal('addTaskModal')">+ Vazifa</button></div>
+        </div>
+        <div class="sg" id="dashStats">
+          <div class="sc"><div class="si">👥</div><div class="sv" style="color:var(--accent)" id="ds-workers">—</div><div class="sl">Jami xodimlar</div></div>
+          <div class="sc"><div class="si">✅</div><div class="sv" style="color:var(--success)" id="ds-present">—</div><div class="sl">Bugun kelgan</div></div>
+          <div class="sc"><div class="si">📋</div><div class="sv" style="color:var(--warning)" id="ds-tasks">—</div><div class="sl">Faol vazifalar</div></div>
+          <div class="sc"><div class="si">📍</div><div class="sv" style="color:#a78bfa" id="ds-online">—</div><div class="sl">Online</div></div>
+        </div>
+        <div class="g2">
+          <div class="card">
+            <div class="ch"><h3>✅ So'nggi Davomatlar</h3><button class="btn btn-s" onclick="showPage('attendance')" style="font-size:11px">Barchasi →</button></div>
+            <div id="dashAttList"><div class="loading">Yuklanmoqda...</div></div>
+          </div>
+          <div class="card">
+            <div class="ch"><h3>📋 Faol Vazifalar</h3><button class="btn btn-p" onclick="openModal('addTaskModal')" style="font-size:11px">+ Qo'shish</button></div>
+            <div id="dashTaskList"><div class="loading">Yuklanmoqda...</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- USERS -->
+      <div class="page" id="page-users">
+        <div class="ph"><div><h2>👥 Foydalanuvchilar</h2><p>Barchani boshqarish</p></div>
+          <button class="btn btn-p" onclick="openModal('addUserModal')">+ Qo'shish</button>
+        </div>
+        <div class="card">
+          <div id="userTableWrap"><div class="loading">Yuklanmoqda...</div></div>
+        </div>
+      </div>
+
+      <!-- PERMISSIONS -->
+      <div class="page" id="page-permissions">
+        <div class="ph"><div><h2>🔐 Ruxsatlar</h2><p>Rol huquqlarini sozlash</p></div>
+          <button class="btn btn-p" onclick="savePermissions()">💾 Saqlash</button>
+        </div>
+        <div style="display:flex;gap:9px;margin-bottom:18px">
+          <button class="btn btn-del" id="pt-supervisor" onclick="switchPermTab('supervisor')">🔶 Admin</button>
+          <button class="btn btn-s" id="pt-worker" onclick="switchPermTab('worker')" style="opacity:.5">👷 Nazoratchi</button>
+        </div>
+        <div id="permPanel-supervisor">
+          <div class="card">
+            <div class="ch"><h3>🔶 Admin ruxsatlari</h3></div>
+            <table class="perm-table">
+              <thead><tr><th>Funksiya</th><th>Ruxsat</th></tr></thead>
+              <tbody>
+                <tr><td>👥 O'z guruhi xodimlarini ko'rish</td><td><label class="toggle-sw"><input type="checkbox" id="s_view_users" checked><span class="tog-sl"></span></label></td></tr>
+                <tr><td>📋 Guruhga vazifa berish</td><td><label class="toggle-sw"><input type="checkbox" id="s_add_tasks" checked><span class="tog-sl"></span></label></td></tr>
+                <tr><td>✅ Guruh davomatini ko'rish</td><td><label class="toggle-sw"><input type="checkbox" id="s_view_att" checked><span class="tog-sl"></span></label></td></tr>
+                <tr><td>🗺️ GPS xaritani ko'rish</td><td><label class="toggle-sw"><input type="checkbox" id="s_view_map" checked><span class="tog-sl"></span></label></td></tr>
+                <tr><td>📈 Hisobotlarni ko'rish</td><td><label class="toggle-sw"><input type="checkbox" id="s_view_rep" checked><span class="tog-sl"></span></label></td></tr>
+                <tr><td>⚙️ Sozlamalarni ko'rish</td><td><label class="toggle-sw"><input type="checkbox" id="s_view_set"><span class="tog-sl"></span></label></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div id="permPanel-worker" style="display:none">
+          <div class="card">
+            <div class="ch"><h3>👷 Nazoratchi ruxsatlari</h3></div>
+            <table class="perm-table">
+              <thead><tr><th>Funksiya</th><th>Ruxsat</th></tr></thead>
+              <tbody>
+                <tr><td>📋 O'z vazifalarini ko'rish</td><td><label class="toggle-sw"><input type="checkbox" id="w_view_tasks" checked><span class="tog-sl"></span></label></td></tr>
+                <tr><td>✅ Check-in/out qilish</td><td><label class="toggle-sw"><input type="checkbox" id="w_checkin" checked><span class="tog-sl"></span></label></td></tr>
+                <tr><td>📍 GPS yuborish</td><td><label class="toggle-sw"><input type="checkbox" id="w_gps" checked><span class="tog-sl"></span></label></td></tr>
+                <tr><td>🔔 Bildirishnomalar</td><td><label class="toggle-sw"><input type="checkbox" id="w_notif" checked><span class="tog-sl"></span></label></td></tr>
+                <tr><td>🗺️ GPS xaritani ko'rish</td><td><label class="toggle-sw"><input type="checkbox" id="w_map"><span class="tog-sl"></span></label></td></tr>
+                <tr><td>📈 Hisobotlarni ko'rish</td><td><label class="toggle-sw"><input type="checkbox" id="w_rep"><span class="tog-sl"></span></label></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ATTENDANCE -->
+      <div class="page" id="page-attendance">
+        <div class="ph"><div><h2>✅ Davomat</h2><p>Kelish-ketish vaqtlari</p></div>
+          <div class="ha"><input type="date" id="attDate" class="btn btn-s" onchange="loadAttendance()"><button class="btn btn-p" onclick="exportAtt()">📥 Export</button></div>
+        </div>
+        <div class="sg mb18" id="attStats">
+          <div class="sc"><div class="sv" style="color:var(--success)" id="as-present">—</div><div class="sl">Kelgan</div></div>
+          <div class="sc"><div class="sv" style="color:var(--danger)" id="as-absent">—</div><div class="sl">Kelmagan</div></div>
+          <div class="sc"><div class="sv" style="color:var(--warning)" id="as-late">—</div><div class="sl">Kech qolgan</div></div>
+          <div class="sc"><div class="sv" style="color:var(--accent)" id="as-total">—</div><div class="sl">Jami xodim</div></div>
+        </div>
+        <div class="card"><div id="attTableWrap"><div class="loading">Yuklanmoqda...</div></div></div>
+      </div>
+
+      <!-- TASKS -->
+      <div class="page" id="page-tasks">
+        <div class="ph"><div><h2>📋 Vazifalar</h2><p>Barcha topshiriqlar</p></div>
+          <div class="ha">
+            <select class="btn btn-s" id="taskFilter" onchange="loadTasks()" style="padding:7px 12px">
+              <option value="all">Barchasi</option><option value="pending">Kutilmoqda</option><option value="active">Jarayonda</option><option value="done">Bajarildi</option>
+            </select>
+            <button class="btn btn-p" onclick="openModal('addTaskModal')">+ Yangi</button>
+          </div>
+        </div>
+        <div class="card"><div id="taskListWrap"><div class="loading">Yuklanmoqda...</div></div></div>
+      </div>
+
+      <!-- REPORTS -->
+      <div class="page" id="page-reports">
+        <div class="ph"><div><h2>📈 Hisobotlar</h2><p>Tahlil va statistika</p></div></div>
+        <div class="sg mb18">
+          <div class="sc"><div class="sv" style="color:var(--success)">87%</div><div class="sl">O'rtacha davomat</div></div>
+          <div class="sc"><div class="sv" style="color:var(--accent)" id="r-total">—</div><div class="sl">Jami vazifalar</div></div>
+          <div class="sc"><div class="sv" style="color:var(--warning)">94%</div><div class="sl">Bajarilgan %</div></div>
+          <div class="sc"><div class="sv" style="color:#a78bfa">8.2s</div><div class="sl">O'rtacha ish soati</div></div>
+        </div>
+      </div>
+
+      <!-- NOTIFICATIONS -->
+      <div class="page" id="page-notifications">
+        <div class="ph"><div><h2>🔔 Bildirishnomalar</h2></div><button class="btn btn-s" onclick="loadNotifications()">🔄</button></div>
+        <div class="card"><div id="notifList"><div class="loading">Yuklanmoqda...</div></div></div>
+      </div>
+
+      <!-- SETTINGS -->
+      <div class="page" id="page-settings">
+        <div class="ph"><div><h2>⚙️ Sozlamalar</h2></div></div>
+        <div class="g2">
+          <div class="card" style="padding:20px">
+            <h3 style="font-family:'Syne',sans-serif;margin-bottom:16px">🏢 Kompaniya</h3>
+            <div class="fg"><label>Nomi</label><input type="text" value="GeoWFM Corp"></div>
+            <div class="fg"><label>Ish boshlanish</label><input type="time" value="09:00"></div>
+            <div class="fg"><label>Ish tugash</label><input type="time" value="18:00"></div>
+            <div class="fg"><label>API URL</label><input type="text" id="apiUrlInput" value="http://localhost:3000/api"></div>
+            <button class="btn btn-p" onclick="saveSettings()">💾 Saqlash</button>
+          </div>
+          <div class="card" style="padding:20px">
+            <h3 style="font-family:'Syne',sans-serif;margin-bottom:16px">🔔 Bildirishnomalar</h3>
+            <div style="display:flex;flex-direction:column;gap:13px">
+              <label style="display:flex;align-items:center;gap:11px;cursor:pointer"><input type="checkbox" checked style="width:15px;height:15px;accent-color:var(--accent)"> Kech qolish</label>
+              <label style="display:flex;align-items:center;gap:11px;cursor:pointer"><input type="checkbox" checked style="width:15px;height:15px;accent-color:var(--accent)"> Vazifa muddati</label>
+              <label style="display:flex;align-items:center;gap:11px;cursor:pointer"><input type="checkbox" checked style="width:15px;height:15px;accent-color:var(--accent)"> GPS chegarasi</label>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SUPERVISOR DASHBOARD -->
+      <div class="page" id="page-supDashboard">
+        <div class="ph"><div><h2>🔶 Admin Paneli</h2><p id="supGroup">—</p></div>
+          <button class="btn btn-p" onclick="openModal('addTaskModal')">+ Vazifa</button>
+        </div>
+        <div class="sg">
+          <div class="sc"><div class="si">👥</div><div class="sv" style="color:var(--accent)" id="sd-workers">—</div><div class="sl">Guruh xodimlari</div></div>
+          <div class="sc"><div class="si">✅</div><div class="sv" style="color:var(--success)" id="sd-present">—</div><div class="sl">Bugun kelgan</div></div>
+          <div class="sc"><div class="si">📋</div><div class="sv" style="color:var(--warning)" id="sd-tasks">—</div><div class="sl">Faol vazifalar</div></div>
+          <div class="sc"><div class="si">📍</div><div class="sv" style="color:#a78bfa">—</div><div class="sl">Online</div></div>
+        </div>
+        <div class="card mb18">
+          <div class="ch"><h3>👥 Guruh xodimlari</h3></div>
+          <div id="supUserList"><div class="loading">Yuklanmoqda...</div></div>
+        </div>
+      </div>
+
+      <!-- PROOFS -->
+      <div class="page" id="page-proofs">
+        <div class="ph"><div><h2>📸 Bajarilish dalillari</h2><p>Ishchilar yuborgan rasmlar</p></div>
+          <button class="btn btn-s" onclick="loadProofs()">🔄 Yangilash</button>
+        </div>
+        <div class="card"><div id="proofsListWrap"><div class="loading">Yuklanmoqda...</div></div></div>
+      </div>
+
+      <!-- WORKER HOME -->
+      <div class="page" id="page-workerHome">
+        <div class="ph"><div><h2 id="wHomeTitle">Assalomu alaykum! 👋</h2><p>Bugun yaxshi ish kuni bo'lsin</p></div></div>
+        <div class="checkin-card">
+          <div class="ci-time" id="liveTime">00:00:00</div>
+          <div class="ci-date" id="liveDate">—</div>
+          <div class="ci-status out" id="ciStatus">⭕ Kirish qilinmagan</div>
+          <button class="ci-btn go" id="ciBtn" onclick="toggleCheckin()">▶</button>
+          <div style="margin-top:13px;font-size:13px;color:var(--text2)" id="ciInfo">Ish boshlash uchun bosing</div>
+          <div style="margin-top:5px;font-size:12px;color:rgba(0,212,255,.6)" id="ciLoc">📍 Aniqlanmoqda...</div>
+        </div>
+        <div class="card">
+          <div class="ch"><h3>📋 Bugungi Vazifalarim</h3></div>
+          <div id="workerTaskList"><div class="loading">Yuklanmoqda...</div></div>
+        </div>
+      </div>
+
+      <!-- WORKER ATTENDANCE -->
+      <div class="page" id="page-myAttendance">
+        <div class="ph"><div><h2>📅 Mening Davomatim</h2></div></div>
+        <div class="sg mb18">
+          <div class="sc"><div class="sv" style="color:var(--success)" id="wa-days">—</div><div class="sl">Bu oyda kelgan</div></div>
+          <div class="sc"><div class="sv" style="color:var(--accent)" id="wa-hours">—</div><div class="sl">Jami soat</div></div>
+          <div class="sc"><div class="sv" style="color:var(--warning)" id="wa-late">—</div><div class="sl">Kech qolgan</div></div>
+          <div class="sc"><div class="sv" style="color:var(--success)" id="wa-pct">—</div><div class="sl">Davomat %</div></div>
+        </div>
+        <div class="card"><div id="myAttList"><div class="loading">Yuklanmoqda...</div></div></div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<!-- MODALS -->
+<div class="modal-overlay" id="addUserModal">
+  <div class="modal">
+    <h3>👤 Foydalanuvchi qo'shish</h3>
+    <div class="ir">
+      <div class="fg"><label>Ism Familiya</label><input type="text" id="nu-name" placeholder="To'liq ism"></div>
+      <div class="fg"><label>Email</label><input type="email" id="nu-email" placeholder="email@geo.uz"></div>
+    </div>
+    <div class="ir">
+      <div class="fg"><label>Parol</label><input type="password" id="nu-pass" placeholder="Kamida 4 belgi"></div>
+      <div class="fg"><label>Rol</label>
+        <select id="nu-role" onchange="updateRoleDesc()">
+          <option value="worker">👷 Nazoratchi</option>
+          <option value="supervisor">🔶 Admin</option>
+          <option value="admin">👑 Bosh Admin</option>
+        </select>
+      </div>
+    </div>
+    <div class="ir">
+      <div class="fg"><label>Lavozim</label><input type="text" id="nu-pos" placeholder="Lavozim"></div>
+      <div class="fg"><label>Guruh / Bo'lim</label>
+        <select id="nu-group">
+          <option>Guruh A</option><option>Guruh B</option><option>Guruh C</option><option>Boshqaruv</option><option>Moliya</option>
+        </select>
+      </div>
+    </div>
+    <div class="fg"><label>Telefon</label><input type="tel" id="nu-phone" placeholder="+998 90 000 00 00"></div>
+    <div style="background:var(--surface2);border-radius:9px;padding:12px;font-size:13px;color:var(--text2);line-height:1.6" id="roleDescBox">
+      👷 Nazoratchi: Faqat o'z vazifalari va davomat.
+    </div>
+    <div class="mf">
+      <button class="btn btn-s" onclick="closeModal('addUserModal')">Bekor</button>
+      <button class="btn btn-p" onclick="addUser()">✓ Saqlash</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="editUserModal">
+  <div class="modal">
+    <h3>✏️ Foydalanuvchini tahrirlash</h3>
+    <input type="hidden" id="eu-id">
+    <div class="ir">
+      <div class="fg"><label>Ism Familiya</label><input type="text" id="eu-name"></div>
+      <div class="fg"><label>Rol</label>
+        <select id="eu-role">
+          <option value="worker">👷 Nazoratchi</option>
+          <option value="supervisor">🔶 Admin</option>
+          <option value="admin">👑 Bosh Admin</option>
+        </select>
+      </div>
+    </div>
+    <div class="ir">
+      <div class="fg"><label>Lavozim</label><input type="text" id="eu-pos"></div>
+      <div class="fg"><label>Guruh</label>
+        <select id="eu-group"><option>Guruh A</option><option>Guruh B</option><option>Guruh C</option><option>Boshqaruv</option></select>
+      </div>
+    </div>
+    <div class="ir">
+      <div class="fg"><label>Holat</label>
+        <select id="eu-status"><option value="active">✅ Aktiv</option><option value="blocked">🚫 Bloklangan</option></select>
+      </div>
+      <div class="fg"><label>Yangi parol (ixtiyoriy)</label><input type="password" id="eu-pass" placeholder="Bo'sh qoldiring"></div>
+    </div>
+    <div class="mf">
+      <button class="btn btn-s" onclick="closeModal('editUserModal')">Bekor</button>
+      <button class="btn btn-p" onclick="saveEditUser()">💾 Saqlash</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="addTaskModal">
+  <div class="modal">
+    <h3>📋 Yangi Vazifa</h3>
+    <div class="fg"><label>Vazifa nomi</label><input type="text" id="nt-title" placeholder="Vazifa nomini kiriting"></div>
+    <div class="fg"><label>Tavsif</label><input type="text" id="nt-desc" placeholder="Qisqacha tavsif"></div>
+    <div class="ir">
+      <div class="fg"><label>Xodim</label><select id="nt-user"><option value="">Tanlang...</option></select></div>
+      <div class="fg"><label>Ustunlik</label>
+        <select id="nt-priority"><option value="high">🔴 Yuqori</option><option value="medium">🟡 O'rta</option><option value="low">🔵 Past</option></select>
+      </div>
+    </div>
+    <div class="ir">
+      <div class="fg"><label>Muddat</label><input type="datetime-local" id="nt-deadline"></div>
+      <div class="fg"><label>Joylashuv manzili</label><input type="text" id="nt-loc" placeholder="Ko'cha, bino nomi"></div>
+    </div>
+    <div style="background:var(--surface2);border-radius:10px;padding:13px;margin-bottom:13px">
+      <div style="font-size:12px;color:var(--text2);margin-bottom:8px">📍 Vazifa koordinatalari (GPS tekshiruv uchun)</div>
+      <div class="ir">
+        <div class="fg"><label>Kenglik (Lat)</label><input type="number" step="any" id="nt-lat" placeholder="41.2995"></div>
+        <div class="fg"><label>Uzunlik (Lng)</label><input type="number" step="any" id="nt-lng" placeholder="69.2401"></div>
+      </div>
+      <button class="btn btn-s" onclick="getTaskLocation()" style="font-size:12px;width:100%">📍 Hozirgi joylashuvni olish</button>
+    </div>
+    <div class="mf">
+      <button class="btn btn-s" onclick="closeModal('addTaskModal')">Bekor</button>
+      <button class="btn btn-p" onclick="addTask()">✓ Saqlash</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<!-- PROOF MODAL (ishchi uchun) -->
+<div class="modal-overlay" id="proofModal">
+  <div class="modal">
+    <h3>📸 Vazifa bajarilishini tasdiqlash</h3>
+    <input type="hidden" id="proof-task-id">
+    <div id="proof-gps-status" style="background:var(--surface2);border-radius:9px;padding:12px;margin-bottom:13px;font-size:13px;text-align:center">
+      📍 GPS aniqlanmoqda...
+    </div>
+    <div class="fg">
+      <label>📸 Rasm yuklash</label>
+      <input type="file" id="proof-image" accept="image/*" capture="environment" style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:10px;color:var(--text);width:100%">
+    </div>
+    <div id="proof-preview" style="display:none;margin-bottom:13px">
+      <img id="proof-img-preview" style="width:100%;border-radius:10px;max-height:200px;object-fit:cover">
+    </div>
+    <div class="fg"><label>Izoh</label><input type="text" id="proof-comment" placeholder="Qisqacha izoh..."></div>
+    <div id="proof-upload-status" style="display:none;text-align:center;padding:10px;color:var(--accent)">⏳ Yuklanmoqda...</div>
+    <div class="mf">
+      <button class="btn btn-s" onclick="closeModal('proofModal')">Bekor</button>
+      <button class="btn btn-p" id="proof-submit-btn" onclick="submitProof()">✅ Tasdiqlash</button>
+    </div>
+  </div>
+</div>
+
+<!-- PROOF VIEW MODAL (admin uchun) -->
+<div class="modal-overlay" id="proofViewModal">
+  <div class="modal">
+    <h3>📋 Bajarilish dalillari</h3>
+    <div id="proofViewContent"><div class="loading">Yuklanmoqda...</div></div>
+    <div class="mf"><button class="btn btn-s" onclick="closeModal('proofViewModal')">Yopish</button></div>
+  </div>
+</div>
+
+<script>
+// ─── Config ─────────────────────────────────────────────────
+let API = localStorage.getItem('apiUrl') || 'http://localhost:3000/api';
+let TOKEN = localStorage.getItem('token') || '';
+let ME = JSON.parse(localStorage.getItem('me') || 'null');
+let checkedIn = false;
+let clockInt = null;
+
+// ─── API helper ──────────────────────────────────────────────
+async function api(method, path, body) {
+  try {
+    const r = await fetch(API + path, {
+      method,
+      headers: { 'Content-Type':'application/json', 'Authorization':'Bearer '+TOKEN },
+      body: body ? JSON.stringify(body) : undefined
+    });
+    return await r.json();
+  } catch(e) {
+    return { error: 'Server bilan aloqa yo\'q' };
+  }
+}
+
+// ─── NAV ─────────────────────────────────────────────────────
+const NAVS = {
+  admin: [
+    { lbl:'Asosiy', items:[
+      {ic:'📊',txt:'Dashboard',pg:'dashboard'},
+      {ic:'✅',txt:'Davomat',pg:'attendance'},
+      {ic:'📋',txt:'Vazifalar',pg:'tasks'},
+      {ic:'📸',txt:'Bajarilish dalillari',pg:'proofs'},
+    ]},
+    { lbl:'Boshqaruv', items:[
+      {ic:'👥',txt:'Foydalanuvchilar',pg:'users'},
+      {ic:'🔐',txt:'Ruxsatlar',pg:'permissions'},
+      {ic:'📈',txt:'Hisobotlar',pg:'reports'},
+      {ic:'🔔',txt:'Bildirishnomalar',pg:'notifications'},
+      {ic:'⚙️',txt:'Sozlamalar',pg:'settings'},
+    ]},
+  ],
+  supervisor: [
+    { lbl:'Asosiy', items:[
+      {ic:'📊',txt:'Dashboard',pg:'supDashboard'},
+      {ic:'✅',txt:'Davomat',pg:'attendance'},
+      {ic:'📋',txt:'Vazifalar',pg:'tasks'},
+      {ic:'📸',txt:'Bajarilish dalillari',pg:'proofs'},
+      {ic:'📈',txt:'Hisobotlar',pg:'reports'},
+      {ic:'🔔',txt:'Bildirishnomalar',pg:'notifications'},
+    ]},
+  ],
+  worker: [
+    { lbl:'Asosiy', items:[
+      {ic:'🏠',txt:'Bosh sahifa',pg:'workerHome'},
+      {ic:'📋',txt:'Vazifalarim',pg:'tasks'},
+      {ic:'📅',txt:'Davomatim',pg:'myAttendance'},
+      {ic:'🔔',txt:'Bildirishnomalar',pg:'notifications'},
+    ]},
+  ],
+};
+
+const ROLE_COLORS = {admin:'av-r',supervisor:'av-o',worker:'av-g'};
+const ROLE_LABELS = {admin:'👑 Bosh Admin',supervisor:'🔶 Admin',worker:'👷 Nazoratchi'};
+const ROLE_HOME   = {admin:'dashboard',supervisor:'supDashboard',worker:'workerHome'};
+const ROLE_DESC   = {
+  worker:     '👷 Nazoratchi: Faqat o\'z vazifalari va davomat.',
+  supervisor: '🔶 Admin: O\'z guruhini kuzatadi, vazifa beradi.',
+  admin:      '👑 Bosh Admin: Barcha huquqlarga ega.',
+};
+const AVCOLORS = ['av-g','av-b','av-p','av-o','av-r'];
+
+function avColor(i) { return AVCOLORS[i % AVCOLORS.length]; }
+
+function buildNav(role) {
+  const nav = document.getElementById('sbNav');
+  nav.innerHTML = '';
+  (NAVS[role]||[]).forEach(sec => {
+    const s = document.createElement('div');
+    s.className = 'nav-sec';
+    s.innerHTML = `<div class="nav-lbl">${sec.lbl}</div>`;
+    sec.items.forEach(item => {
+      const el = document.createElement('div');
+      el.className = 'nav-item';
+      el.dataset.page = item.pg;
+      el.innerHTML = `<span class="ic">${item.ic}</span>${item.txt}`;
+      el.onclick = () => showPage(item.pg);
+      s.appendChild(el);
+    });
+    nav.appendChild(s);
+  });
+}
+
+// ─── Login ───────────────────────────────────────────────────
+async function doLogin() {
+  const email = document.getElementById('lEmail').value.trim();
+  const pass  = document.getElementById('lPass').value;
+  const errEl = document.getElementById('loginErr');
+  errEl.style.display = 'none';
+
+  const res = await api('POST', '/auth/login', { email, password: pass });
+  if (res.error) { errEl.textContent = res.error; errEl.style.display = 'block'; return; }
+
+  TOKEN = res.token;
+  ME = res.user;
+  localStorage.setItem('token', TOKEN);
+  localStorage.setItem('me', JSON.stringify(ME));
+
+  initApp();
+}
+
+function doLogout() {
+  TOKEN = ''; ME = null;
+  localStorage.removeItem('token');
+  localStorage.removeItem('me');
+  clearInterval(clockInt);
+  document.getElementById('app').style.display = 'none';
+  document.getElementById('loginPage').style.display = 'flex';
+}
+
+// ─── App init ────────────────────────────────────────────────
+function initApp() {
+  document.getElementById('loginPage').style.display = 'none';
+  document.getElementById('app').style.display = 'block';
+
+  const initials = ME.name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+  document.getElementById('sbAv').textContent = initials;
+  document.getElementById('sbAv').className = 'uav ' + ROLE_COLORS[ME.role];
+  document.getElementById('sbName').textContent = ME.name;
+  document.getElementById('sbRole').textContent = ROLE_LABELS[ME.role];
+  document.getElementById('sbSub').textContent = ME.group || ME.role;
+
+  buildNav(ME.role);
+  updateDate();
+  startClock();
+  loadUserDropdown();
+
+  if (ME.role === 'worker') {
+    document.getElementById('wHomeTitle').textContent = 'Assalomu alaykum, ' + ME.name.split(' ')[0] + '! 👋';
+    getLocation();
+  }
+  if (ME.role === 'supervisor') {
+    document.getElementById('supGroup').textContent = ME.group + ' guruhi';
+  }
+
+  showPage(ROLE_HOME[ME.role]);
+}
+
+// ─── Page router ─────────────────────────────────────────────
+function showPage(pg) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const p = document.getElementById('page-' + pg);
+  if (p) p.classList.add('active');
+  document.querySelectorAll(`.nav-item[data-page="${pg}"]`).forEach(n => n.classList.add('active'));
+  if (window.innerWidth < 768) document.getElementById('sidebar').classList.remove('open');
+
+  // Load data on page open
+  const loaders = {
+    dashboard:    loadDashboard,
+    users:        loadUsers,
+    attendance:   loadAttendance,
+    tasks:        loadTasks,
+    notifications:loadNotifications,
+    supDashboard: loadSupDashboard,
+    workerHome:   loadWorkerTasks,
+    myAttendance: loadMyAttendance,
+    reports:      loadReports,
+    proofs:       loadProofs,
+  };
+  if (loaders[pg]) loaders[pg]();
+}
+
+// ─── DASHBOARD ───────────────────────────────────────────────
+async function loadDashboard() {
+  const d = await api('GET', '/dashboard');
+  if (d.error) return;
+  document.getElementById('ds-workers').textContent = d.totalWorkers || 0;
+  document.getElementById('ds-present').textContent = d.presentToday || 0;
+  document.getElementById('ds-tasks').textContent   = d.activeTasks || 0;
+  document.getElementById('ds-online').textContent  = d.onlineWorkers || 0;
+
+  // Attendance
+  const att = await api('GET', '/attendance?limit=5');
+  const attEl = document.getElementById('dashAttList');
+  if (!att.length) { attEl.innerHTML = '<div class="empty">Ma\'lumot yo\'q</div>'; }
+  else {
+    attEl.innerHTML = att.slice(0,5).map((a,i) => `
+      <div style="display:flex;align-items:center;gap:11px;padding:11px 17px;border-top:1px solid var(--border)">
+        <div class="uav ${avColor(i)}" style="width:32px;height:32px;font-size:12px">${(a.name||'?')[0]}</div>
+        <div style="flex:1"><div style="font-size:13px;font-weight:500">${a.name||'—'}</div><div style="font-size:11px;color:var(--text2)">${a.check_in ? a.check_in.slice(11,16) : '—'} · ${a.location_name||'—'}</div></div>
+        <span class="badge ${a.status==='present'?'success':a.status==='late'?'warning':'danger'}">${a.status==='present'?'Vaqtida':a.status==='late'?'Kech':'Yo\'q'}</span>
+      </div>`).join('');
+  }
+
+  // Tasks
+  const tasks = await api('GET', '/tasks?status=pending');
+  const taskEl = document.getElementById('dashTaskList');
+  if (!tasks.length) { taskEl.innerHTML = '<div class="empty">Vazifa yo\'q</div>'; }
+  else {
+    taskEl.innerHTML = tasks.slice(0,5).map(t => `
+      <div class="task-item">
+        <div class="tp" style="background:${t.priority==='high'?'var(--danger)':t.priority==='medium'?'var(--warning)':'var(--accent)'}"></div>
+        <div class="ti"><div class="tt">${t.title}</div><div class="tm"><span>👤 ${t.assigned_name||'—'}</span></div></div>
+        <span class="badge ${t.status==='done'?'success':t.status==='active'?'warning':'info'}">${t.status==='done'?'Bajarildi':t.status==='active'?'Jarayonda':'Kutilmoqda'}</span>
+      </div>`).join('');
+  }
+}
+
+// ─── USERS ───────────────────────────────────────────────────
+async function loadUsers() {
+  const users = await api('GET', '/users');
+  const el = document.getElementById('userTableWrap');
+  if (users.error) { el.innerHTML = `<div class="empty">${users.error}</div>`; return; }
+  if (!users.length) { el.innerHTML = '<div class="empty">Foydalanuvchi yo\'q</div>'; return; }
+
+  el.innerHTML = `<table>
+    <thead><tr><th>Foydalanuvchi</th><th>Rol</th><th>Guruh</th><th>Telefon</th><th>Holat</th><th>Amallar</th></tr></thead>
+    <tbody>${users.map((u,i) => `
+      <tr>
+        <td><div style="display:flex;align-items:center;gap:9px">
+          <div class="uav ${avColor(i)}" style="width:32px;height:32px;font-size:12px">${(u.name||'?')[0]}</div>
+          <div><div style="font-weight:500">${u.name}</div><div style="font-size:11px;color:var(--text2)">${u.email}</div></div>
+        </div></td>
+        <td><span class="badge ${u.role==='admin'?'ra':u.role==='supervisor'?'rs':'rw'}">${ROLE_LABELS[u.role]||u.role}</span></td>
+        <td>${u.group_name||'—'}</td>
+        <td>${u.phone||'—'}</td>
+        <td><span class="badge ${u.status==='active'?'success':'danger'}">${u.status==='active'?'● Aktiv':'● Bloklangan'}</span></td>
+        <td style="display:flex;gap:5px;flex-wrap:wrap">
+          <button class="btn btn-warn" onclick='openEditUser(${JSON.stringify(u)})'>✏️</button>
+          ${u.role!=='admin'?`<button class="btn btn-del" onclick="deleteUser(${u.id},'${u.name}')">🗑️</button>`:''}
+        </td>
+      </tr>`).join('')}
+    </tbody></table>`;
+}
+
+function openEditUser(u) {
+  document.getElementById('eu-id').value   = u.id;
+  document.getElementById('eu-name').value = u.name;
+  document.getElementById('eu-pos').value  = u.position||'';
+  document.getElementById('eu-pass').value = '';
+  // Set role
+  const rs = document.getElementById('eu-role');
+  [...rs.options].forEach(o => o.selected = o.value===u.role);
+  // Set group
+  const gs = document.getElementById('eu-group');
+  [...gs.options].forEach(o => o.selected = o.text===u.group_name);
+  // Set status
+  const ss = document.getElementById('eu-status');
+  [...ss.options].forEach(o => o.selected = o.value===u.status);
+  openModal('editUserModal');
+}
+
+async function saveEditUser() {
+  const id = document.getElementById('eu-id').value;
+  const body = {
+    name:       document.getElementById('eu-name').value,
+    position:   document.getElementById('eu-pos').value,
+    group_name: document.getElementById('eu-group').value,
+    role:       document.getElementById('eu-role').value,
+    status:     document.getElementById('eu-status').value,
+  };
+  const pass = document.getElementById('eu-pass').value;
+  if (pass) body.password = pass;
+
+  const res = await api('PUT', '/users/'+id, body);
+  if (res.error) { showToast('❌ '+res.error); return; }
+  closeModal('editUserModal');
+  showToast('✅ Yangilandi!');
+  loadUsers();
+}
+
+async function deleteUser(id, name) {
+  if (!confirm(`"${name}" ni o'chirishni tasdiqlaysizmi?`)) return;
+  const res = await api('DELETE', '/users/'+id);
+  if (res.error) { showToast('❌ '+res.error); return; }
+  showToast('🗑️ O\'chirildi!');
+  loadUsers();
+}
+
+async function addUser() {
+  const body = {
+    name:       document.getElementById('nu-name').value,
+    email:      document.getElementById('nu-email').value,
+    password:   document.getElementById('nu-pass').value,
+    role:       document.getElementById('nu-role').value,
+    position:   document.getElementById('nu-pos').value,
+    group_name: document.getElementById('nu-group').value,
+    phone:      document.getElementById('nu-phone').value,
+  };
+  if (!body.name||!body.email||!body.password) { showToast('❌ Ism, email, parol kerak!'); return; }
+  const res = await api('POST', '/users', body);
+  if (res.error) { showToast('❌ '+res.error); return; }
+  closeModal('addUserModal');
+  showToast('✅ Foydalanuvchi qo\'shildi!');
+  loadUsers();
+  loadUserDropdown();
+}
+
+function updateRoleDesc() {
+  const r = document.getElementById('nu-role').value;
+  document.getElementById('roleDescBox').textContent = ROLE_DESC[r]||'';
+}
+
+// ─── USER DROPDOWN (for tasks) ───────────────────────────────
+async function loadUserDropdown() {
+  const users = await api('GET', '/users');
+  const sel = document.getElementById('nt-user');
+  if (!sel || users.error) return;
+  sel.innerHTML = '<option value="">Tanlang...</option>' +
+    (Array.isArray(users) ? users.filter(u=>u.role==='worker').map(u=>`<option value="${u.id}">${u.name}</option>`).join('') : '');
+}
+
+// ─── TASKS ───────────────────────────────────────────────────
+async function loadTasks() {
+  const status = document.getElementById('taskFilter')?.value || 'all';
+  const tasks = await api('GET', `/tasks?status=${status}`);
+  const el = document.getElementById('taskListWrap');
+  if (!el) return;
+  if (tasks.error) { el.innerHTML = `<div class="empty">${tasks.error}</div>`; return; }
+  if (!tasks.length) { el.innerHTML = '<div class="empty">Vazifa yo\'q</div>'; return; }
+
+  const pColors = {high:'var(--danger)',medium:'var(--warning)',low:'var(--accent)'};
+  const isManager = ME.role !== 'worker';
+
+  el.innerHTML = tasks.map(t => `
+    <div class="task-item">
+      <div class="tp" style="background:${pColors[t.priority]||'var(--accent)'}"></div>
+      <div class="ti">
+        <div class="tt">${t.title}</div>
+        <div class="tm">
+          ${t.assigned_name?`<span>👤 ${t.assigned_name}</span>`:''}
+          ${t.deadline?`<span>📅 ${t.deadline.slice(0,16).replace('T',' ')}</span>`:''}
+          ${t.location?`<span>📍 ${t.location}</span>`:''}
+        </div>
+      </div>
+      <span class="badge ${t.status==='done'?'success':t.status==='active'?'warning':'info'}">${t.status==='done'?'Bajarildi':t.status==='active'?'Jarayonda':'Kutilmoqda'}</span>
+      <div style="display:flex;gap:5px;margin-left:8px">
+        ${t.status==='done'?`<button class="btn btn-s" onclick="viewTaskProof(${t.id})" style="font-size:11px">📸 Dalil</button>`:''}
+        ${t.status!=='done'?`<button class="btn btn-ok" onclick="completeTask(${t.id})">✓</button>`:''}
+        ${isManager?`<button class="btn btn-del" onclick="deleteTask(${t.id})">✕</button>`:''}
+      </div>
+    </div>`).join('');
+}
+
+async function loadWorkerTasks() {
+  const tasks = await api('GET', '/tasks');
+  const el = document.getElementById('workerTaskList');
+  if (!el) return;
+  if (!tasks.length) { el.innerHTML = '<div class="empty">Bugun vazifa yo\'q</div>'; return; }
+  const pColors = {high:'var(--danger)',medium:'var(--warning)',low:'var(--accent)'};
+  el.innerHTML = tasks.map(t => `
+    <div class="task-item">
+      <div class="tp" style="background:${pColors[t.priority]||'var(--accent)'}"></div>
+      <div class="ti">
+        <div class="tt">${t.title}</div>
+        <div class="tm">
+          ${t.deadline?`<span>📅 ${t.deadline.slice(0,16).replace('T',' ')}</span>`:''}
+          ${t.location?`<span>📍 ${t.location}</span>`:''}
+        </div>
+      </div>
+      <span class="badge ${t.status==='done'?'success':t.status==='active'?'warning':'info'}">${t.status==='done'?'Bajarildi ✓':t.status==='active'?'Jarayonda':'Kutilmoqda'}</span>
+      ${t.status!=='done'?`<button class="btn btn-ok" style="margin-left:8px" onclick="openProofModal(${t.id},${t.location_lat||'null'},${t.location_lng||'null'})">📸 Bajarildi</button>`:''}
+    </div>`).join('');
+}
+
+async function addTask() {
+  const body = {
+    title:        document.getElementById('nt-title').value,
+    description:  document.getElementById('nt-desc').value,
+    assigned_to:  document.getElementById('nt-user').value || null,
+    priority:     document.getElementById('nt-priority').value,
+    deadline:     document.getElementById('nt-deadline').value || null,
+    location:     document.getElementById('nt-loc').value,
+    location_lat: parseFloat(document.getElementById('nt-lat').value) || null,
+    location_lng: parseFloat(document.getElementById('nt-lng').value) || null,
+  };
+  if (!body.title) { showToast('❌ Vazifa nomi kerak!'); return; }
+  const res = await api('POST', '/tasks', body);
+  if (res.error) { showToast('❌ '+res.error); return; }
+  closeModal('addTaskModal');
+  showToast('✅ Vazifa qo\'shildi!');
+  loadTasks();
+  loadDashboard();
+}
+
+function getTaskLocation() {
+  if (!navigator.geolocation) { showToast('❌ GPS mavjud emas'); return; }
+  showToast('📍 Joylashuv aniqlanmoqda...');
+  navigator.geolocation.getCurrentPosition(p => {
+    document.getElementById('nt-lat').value = p.coords.latitude.toFixed(6);
+    document.getElementById('nt-lng').value = p.coords.longitude.toFixed(6);
+    showToast('✅ Koordinatlar olindi!');
+  }, () => showToast('❌ GPS aniqlanmadi'));
+}
+
+// Ikki nuqta orasidagi masofa (metrda)
+function calcDistance(lat1, lng1, lat2, lng2) {
+  const R = 6371000;
+  const dLat = (lat2-lat1)*Math.PI/180;
+  const dLng = (lng2-lng1)*Math.PI/180;
+  const a = Math.sin(dLat/2)**2 + Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLng/2)**2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+}
+
+// Ishchi vazifani bajarishga ochishi
+let currentProofLat = null, currentProofLng = null, currentTaskData = null;
+
+async function openProofModal(taskId, taskLat, taskLng) {
+  currentTaskData = { id: taskId, lat: taskLat, lng: taskLng };
+  currentProofLat = null; currentProofLng = null;
+  document.getElementById('proof-task-id').value = taskId;
+  document.getElementById('proof-comment').value = '';
+  document.getElementById('proof-preview').style.display = 'none';
+  document.getElementById('proof-upload-status').style.display = 'none';
+  document.getElementById('proof-submit-btn').disabled = true;
+
+  const statusEl = document.getElementById('proof-gps-status');
+
+  // Agar koordinat yo'q bo'lsa, to'g'ridan bajarish mumkin
+  if (!taskLat || !taskLng) {
+    statusEl.innerHTML = '✅ GPS tekshiruv shart emas — bajarishingiz mumkin';
+    statusEl.style.color = 'var(--success)';
+    document.getElementById('proof-submit-btn').disabled = false;
+    openModal('proofModal');
+    return;
+  }
+
+  statusEl.innerHTML = '📍 Joylashuvingiz aniqlanmoqda...';
+  statusEl.style.color = 'var(--accent)';
+  openModal('proofModal');
+
+  if (!navigator.geolocation) {
+    statusEl.innerHTML = '⚠️ GPS mavjud emas — bajarishingiz mumkin';
+    document.getElementById('proof-submit-btn').disabled = false;
+    return;
+  }
+
+  navigator.geolocation.getCurrentPosition(p => {
+    currentProofLat = p.coords.latitude;
+    currentProofLng = p.coords.longitude;
+    const dist = Math.round(calcDistance(currentProofLat, currentProofLng, taskLat, taskLng));
+
+    if (dist <= 300) {
+      statusEl.innerHTML = `✅ Siz vazifa joyidasiz! (${dist}m uzoqlikda)`;
+      statusEl.style.color = 'var(--success)';
+      document.getElementById('proof-submit-btn').disabled = false;
+    } else {
+      statusEl.innerHTML = `❌ Siz vazifa joyidan ${dist}m uzoqdasiz! (300m ichida bo'lish kerak)`;
+      statusEl.style.color = 'var(--danger)';
+      document.getElementById('proof-submit-btn').disabled = true;
+    }
+  }, () => {
+    statusEl.innerHTML = '⚠️ GPS aniqlanmadi — bajarishingiz mumkin';
+    statusEl.style.color = 'var(--warning)';
+    document.getElementById('proof-submit-btn').disabled = false;
+  }, { timeout: 10000 });
+
+  // Rasm preview
+  document.getElementById('proof-image').onchange = function() {
+    const file = this.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = e => {
+        document.getElementById('proof-img-preview').src = e.target.result;
+        document.getElementById('proof-preview').style.display = 'block';
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+}
+
+async function submitProof() {
+  const taskId = document.getElementById('proof-task-id').value;
+  const comment = document.getElementById('proof-comment').value;
+  const fileInput = document.getElementById('proof-image');
+  const statusEl = document.getElementById('proof-upload-status');
+  const btn = document.getElementById('proof-submit-btn');
+
+  btn.disabled = true;
+  statusEl.style.display = 'block';
+  statusEl.textContent = '⏳ Rasm yuklanmoqda...';
+
+  let imageUrl = '';
+
+  if (fileInput.files[0]) {
+    try {
+      const formData = new FormData();
+      formData.append('image', fileInput.files[0]);
+      formData.append('key', '3a4c5bc8792b94267c256baf1d486157');
+      const r = await fetch('https://api.imgbb.com/1/upload', { method:'POST', body:formData });
+      const d = await r.json();
+      if (d.success) imageUrl = d.data.url;
+      else { showToast('❌ Rasm yuklanmadi'); btn.disabled = false; return; }
+    } catch(e) {
+      showToast('❌ Rasm yuklashda xatolik'); btn.disabled = false; return;
+    }
+  }
+
+  statusEl.textContent = '⏳ Saqlanmoqda...';
+  const dist = (currentProofLat && currentTaskData?.lat)
+    ? Math.round(calcDistance(currentProofLat, currentProofLng, currentTaskData.lat, currentTaskData.lng))
+    : 0;
+
+  const res = await api('POST', `/tasks/${taskId}/proof`, {
+    image_url: imageUrl,
+    comment,
+    latitude: currentProofLat,
+    longitude: currentProofLng,
+    distance_to_task: dist
+  });
+
+  if (res.error) { showToast('❌ '+res.error); btn.disabled = false; return; }
+  statusEl.style.display = 'none';
+  closeModal('proofModal');
+  showToast('✅ Vazifa bajarildi va tasdiqlandi!');
+  loadWorkerTasks();
+  loadTasks();
+}
+
+// Admin/supervisor prooflarni ko'rish
+async function loadProofs() {
+  const el = document.getElementById('proofsListWrap');
+  if (!el) return;
+  el.innerHTML = '<div class="loading">Yuklanmoqda...</div>';
+  const proofs = await api('GET', '/proofs');
+  if (proofs.error) { el.innerHTML = `<div class="empty">${proofs.error}</div>`; return; }
+  if (!proofs.length) { el.innerHTML = '<div class="empty">Hali dalil yo\'q</div>'; return; }
+
+  el.innerHTML = proofs.map(p => `
+    <div style="padding:16px 20px;border-top:1px solid var(--border);display:flex;gap:14px;align-items:flex-start">
+      ${p.image_url ? `<img src="${p.image_url}" style="width:90px;height:90px;object-fit:cover;border-radius:10px;flex-shrink:0;cursor:pointer" onclick="window.open('${p.image_url}','_blank')">` : '<div style="width:90px;height:90px;background:var(--surface2);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0">📷</div>'}
+      <div style="flex:1">
+        <div style="font-size:14px;font-weight:600;margin-bottom:4px">${p.task_title||'—'}</div>
+        <div style="font-size:12px;color:var(--text2);margin-bottom:4px">👤 ${p.worker_name||'—'} • 📍 ${p.location||'—'}</div>
+        ${p.comment?`<div style="font-size:13px;margin-bottom:4px">💬 ${p.comment}</div>`:''}
+        <div style="font-size:11px;color:var(--text2)">
+          🕐 ${p.submitted_at?p.submitted_at.slice(0,16).replace('T',' '):'—'}
+          ${p.distance_to_task?` • 📏 ${p.distance_to_task}m uzoqlikda`:''}
+        </div>
+      </div>
+      <span class="badge success">✅ Bajarildi</span>
+    </div>`).join('');
+}
+
+async function viewTaskProof(taskId) {
+  openModal('proofViewModal');
+  const proofs = await api('GET', `/tasks/${taskId}/proof`);
+  const el = document.getElementById('proofViewContent');
+  if (!proofs.length) { el.innerHTML = '<div class="empty">Dalil yuklanmagan</div>'; return; }
+  el.innerHTML = proofs.map(p => `
+    <div style="margin-bottom:16px">
+      ${p.image_url?`<img src="${p.image_url}" style="width:100%;border-radius:10px;max-height:300px;object-fit:cover;cursor:pointer;margin-bottom:10px" onclick="window.open('${p.image_url}','_blank')">`:''}
+      <div style="font-size:13px;color:var(--text2)">👤 ${p.name} • 🕐 ${p.submitted_at?p.submitted_at.slice(0,16).replace('T',' '):'—'}</div>
+      ${p.comment?`<div style="font-size:13px;margin-top:5px">💬 ${p.comment}</div>`:''}
+      ${p.distance_to_task?`<div style="font-size:12px;color:var(--text2);margin-top:4px">📏 Vazifa joyidan ${p.distance_to_task}m uzoqlikda bajarilgan</div>`:''}
+    </div>`).join('');
+
+async function completeTask(id) {
+  const res = await api('PUT', '/tasks/'+id, { status:'done' });
+  if (res.error) { showToast('❌ '+res.error); return; }
+  showToast('✅ Vazifa bajarildi!');
+  loadTasks();
+  loadWorkerTasks();
+  loadDashboard();
+}
+
+async function deleteTask(id) {
+  if (!confirm('Vazifani o\'chirishni tasdiqlaysizmi?')) return;
+  const res = await api('DELETE', '/tasks/'+id);
+  if (res.error) { showToast('❌ '+res.error); return; }
+  showToast('🗑️ Vazifa o\'chirildi!');
+  loadTasks();
+}
+
+// ─── ATTENDANCE ──────────────────────────────────────────────
+async function loadAttendance() {
+  const date = document.getElementById('attDate')?.value || new Date().toISOString().split('T')[0];
+  const att = await api('GET', `/attendance?date=${date}`);
+  const el = document.getElementById('attTableWrap');
+  if (!el) return;
+  if (att.error) { el.innerHTML = `<div class="empty">${att.error}</div>`; return; }
+
+  // Stats
+  const present = att.filter(a=>a.check_in).length;
+  const late    = att.filter(a=>a.status==='late').length;
+  const total   = att.length;
+  document.getElementById('as-present').textContent = present;
+  document.getElementById('as-absent').textContent  = 0;
+  document.getElementById('as-late').textContent    = late;
+  document.getElementById('as-total').textContent   = total;
+
+  if (!att.length) { el.innerHTML = '<div class="empty">Ma\'lumot yo\'q</div>'; return; }
+
+  el.innerHTML = `<table>
+    <thead><tr><th>Xodim</th><th>Kirish</th><th>Chiqish</th><th>Ish soati</th><th>Joylashuv</th><th>Holat</th></tr></thead>
+    <tbody>${att.map(a=>`
+      <tr>
+        <td>${a.name||'—'}</td>
+        <td>${a.check_in?a.check_in.slice(11,16):'—'}</td>
+        <td>${a.check_out?a.check_out.slice(11,16):'—'}</td>
+        <td>${a.work_hours?a.work_hours+'s':'—'}</td>
+        <td>${a.location_name||'—'}</td>
+        <td><span class="badge ${a.status==='present'?'success':a.status==='late'?'warning':'danger'}">${a.status==='present'?'Vaqtida':a.status==='late'?'Kech':'Yo\'q'}</span></td>
+      </tr>`).join('')}
+    </tbody></table>`;
+}
+
+async function loadMyAttendance() {
+  const att = await api('GET', '/attendance');
+  const el = document.getElementById('myAttList');
+  if (!el) return;
+  const days  = att.filter(a=>a.check_in).length;
+  const hours = att.reduce((s,a)=>s+(parseFloat(a.work_hours)||0),0).toFixed(1);
+  const late  = att.filter(a=>a.status==='late').length;
+  document.getElementById('wa-days').textContent  = days;
+  document.getElementById('wa-hours').textContent = hours+'s';
+  document.getElementById('wa-late').textContent  = late;
+  document.getElementById('wa-pct').textContent   = days ? Math.round(days/(days+att.filter(a=>!a.check_in).length)*100)+'%' : '—';
+
+  if (!att.length) { el.innerHTML = '<div class="empty">Ma\'lumot yo\'q</div>'; return; }
+  el.innerHTML = `<table>
+    <thead><tr><th>Sana</th><th>Kirish</th><th>Chiqish</th><th>Soat</th><th>Holat</th></tr></thead>
+    <tbody>${att.map(a=>`
+      <tr>
+        <td>${a.date||'—'}</td>
+        <td>${a.check_in?a.check_in.slice(11,16):'—'}</td>
+        <td>${a.check_out?a.check_out.slice(11,16):'—'}</td>
+        <td>${a.work_hours||0}s</td>
+        <td><span class="badge ${a.status==='present'?'success':a.status==='late'?'warning':'danger'}">${a.status==='present'?'Vaqtida':a.status==='late'?'Kech':'Yo\'q'}</span></td>
+      </tr>`).join('')}
+    </tbody></table>`;
+}
+
+// ─── CHECK-IN ────────────────────────────────────────────────
+async function toggleCheckin() {
+  const btn = document.getElementById('ciBtn');
+  const st  = document.getElementById('ciStatus');
+  const inf = document.getElementById('ciInfo');
+
+  if (!checkedIn) {
+    let lat, lng, locName = 'Noma\'lum';
+    if (navigator.geolocation) {
+      await new Promise(r => navigator.geolocation.getCurrentPosition(p => { lat=p.coords.latitude; lng=p.coords.longitude; locName=`${lat.toFixed(4)}, ${lng.toFixed(4)}`; r(); }, r, {timeout:5000}));
+    }
+    const res = await api('POST', '/attendance/checkin', { latitude:lat, longitude:lng, location_name:locName });
+    if (res.error) { showToast('❌ '+res.error); return; }
+    checkedIn = true;
+    btn.className = 'ci-btn stop'; btn.textContent = '⏹';
+    st.className = 'ci-status in'; st.textContent = '🟢 Ish vaqtida';
+    inf.textContent = 'Kirish: ' + new Date().toTimeString().slice(0,5);
+    showToast('✅ Muvaffaqiyatli kirdingiz!');
+  } else {
+    const res = await api('POST', '/attendance/checkout', {});
+    if (res.error) { showToast('❌ '+res.error); return; }
+    checkedIn = false;
+    btn.className = 'ci-btn go'; btn.textContent = '▶';
+    st.className = 'ci-status out'; st.textContent = '⭕ Chiqish qilindi';
+    inf.textContent = 'Ish vaqti: ' + (res.work_hours||0) + ' soat';
+    showToast('✅ Chiqish qilindi! ' + (res.work_hours||0) + ' soat');
+  }
+}
+
+// ─── SUPERVISOR ──────────────────────────────────────────────
+async function loadSupDashboard() {
+  const d = await api('GET', '/dashboard');
+  if (!d.error) {
+    document.getElementById('sd-workers').textContent = d.totalWorkers||0;
+    document.getElementById('sd-present').textContent = d.presentToday||0;
+    document.getElementById('sd-tasks').textContent   = d.activeTasks||0;
+  }
+  const users = await api('GET', '/users');
+  const el = document.getElementById('supUserList');
+  if (!el) return;
+  if (!users.length) { el.innerHTML = '<div class="empty">Xodim yo\'q</div>'; return; }
+  el.innerHTML = users.map((u,i)=>`
+    <div style="display:flex;align-items:center;gap:11px;padding:12px 17px;border-top:1px solid var(--border)">
+      <div class="uav ${avColor(i)}" style="width:32px;height:32px;font-size:12px">${(u.name||'?')[0]}</div>
+      <div style="flex:1"><div style="font-size:13px;font-weight:500">${u.name}</div><div style="font-size:11px;color:var(--text2)">${u.position||'—'}</div></div>
+      <span class="badge ${u.status==='active'?'success':'danger'}">${u.status==='active'?'● Aktiv':'● Yo\'q'}</span>
+    </div>`).join('');
+}
+
+// ─── NOTIFICATIONS ───────────────────────────────────────────
+async function loadNotifications() {
+  const notifs = await api('GET', '/notifications');
+  const el = document.getElementById('notifList');
+  if (!el) return;
+  if (!notifs.length) { el.innerHTML = '<div class="empty">Bildirishnoma yo\'q</div>'; return; }
+  const icons = {success:'✅',warning:'⚠️',info:'📋',danger:'❌'};
+  const bgmap = {success:'rgba(16,185,129,.15)',warning:'rgba(245,158,11,.15)',info:'rgba(0,212,255,.15)',danger:'rgba(239,68,68,.15)'};
+  el.innerHTML = notifs.map(n=>`
+    <div class="task-item">
+      <div style="width:36px;height:36px;border-radius:9px;background:${bgmap[n.type]||bgmap.info};display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0">${icons[n.type]||'📋'}</div>
+      <div style="flex:1"><div style="font-size:13px;font-weight:500">${n.title}</div><div style="font-size:12px;color:var(--text2)">${n.message||''}</div><div style="font-size:11px;color:var(--text2);margin-top:2px">${n.created_at?n.created_at.slice(0,16).replace('T',' '):'—'}</div></div>
+    </div>`).join('');
+}
+
+// ─── REPORTS ─────────────────────────────────────────────────
+async function loadReports() {
+  const tasks = await api('GET', '/tasks');
+  if (!tasks.error) document.getElementById('r-total').textContent = tasks.length;
+}
+
+// ─── PERMISSIONS ─────────────────────────────────────────────
+function switchPermTab(role) {
+  ['supervisor','worker'].forEach(r => {
+    document.getElementById('permPanel-'+r).style.display = r===role?'block':'none';
+    document.getElementById('pt-'+r).style.opacity = r===role?'1':'.4';
+  });
+}
+
+async function savePermissions() {
+  showToast('✅ Ruxsatlar saqlandi!');
+}
+
+// ─── CLOCK ───────────────────────────────────────────────────
+function pad(n) { return String(n).padStart(2,'0'); }
+function startClock() {
+  clockInt = setInterval(() => {
+    const n = new Date();
+    const el = document.getElementById('liveTime');
+    if (el) el.textContent = `${pad(n.getHours())}:${pad(n.getMinutes())}:${pad(n.getSeconds())}`;
+  }, 1000);
+}
+function updateDate() {
+  const days = ['Yakshanba','Dushanba','Seshanba','Chorshanba','Payshanba','Juma','Shanba'];
+  const months = ['Yanvar','Fevral','Mart','Aprel','May','Iyun','Iyul','Avgust','Sentyabr','Oktyabr','Noyabr','Dekabr'];
+  const n = new Date();
+  const s = `${n.getDate()} ${months[n.getMonth()]} ${n.getFullYear()}, ${days[n.getDay()]}`;
+  ['liveDate','dashDate'].forEach(id=>{const e=document.getElementById(id);if(e)e.textContent=s;});
+  const ad = document.getElementById('attDate');
+  if (ad) ad.value = n.toISOString().split('T')[0];
+}
+
+function getLocation() {
+  const el = document.getElementById('ciLoc');
+  if (!el) return;
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(p => {
+      el.textContent = `📍 ${p.coords.latitude.toFixed(4)}, ${p.coords.longitude.toFixed(4)}`;
+    }, () => { el.textContent = '📍 GPS aniqlanmadi'; });
+  }
+}
+
+// ─── SETTINGS ────────────────────────────────────────────────
+function saveSettings() {
+  const url = document.getElementById('apiUrlInput').value.trim();
+  if (url) { API = url; localStorage.setItem('apiUrl', url); }
+  showToast('✅ Saqlandi!');
+}
+
+function exportAtt() { showToast('📥 Export tayyorlanmoqda...'); }
+
+// ─── MODAL ───────────────────────────────────────────────────
+function openModal(id) {
+  document.getElementById(id).classList.add('open');
+  if (id === 'addTaskModal') loadUserDropdown();
+}
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+document.querySelectorAll('.modal-overlay').forEach(m => m.addEventListener('click', e => { if(e.target===m) m.classList.remove('open'); }));
+
+// ─── TOAST ───────────────────────────────────────────────────
+let toastT;
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.style.display = 'block';
+  clearTimeout(toastT);
+  toastT = setTimeout(()=>t.style.display='none', 3000);
+}
+
+// ─── AUTO LOGIN ──────────────────────────────────────────────
+if (TOKEN && ME) { initApp(); } else { updateDate(); }
+</script>
+</body>
+</html>
