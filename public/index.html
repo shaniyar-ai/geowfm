@@ -136,14 +136,14 @@ input:checked+.tog-sl:before{transform:translateX(19px);}
 <div id="loginPage">
   <div class="login-box">
     <div class="logo"><div class="logo-icon">🌐</div><h1>Geo<span>WFM</span></h1></div>
-    <div class="fg"><label>Email</label><input type="email" id="lEmail" value="sh.xaytbayev@geo.uz"></div>
+    <div class="fg"><label>Email</label><input type="email" id="lEmail" value="admin@geo.uz"></div>
     <div class="fg"><label>Parol</label><input type="password" id="lPass" value="1234" onkeydown="if(event.key==='Enter')doLogin()"></div>
     <button class="btn-login" onclick="doLogin()">Kirish →</button>
     <div class="err-msg" id="loginErr">Email yoki parol noto'g'ri!</div>
     <div class="demo-hint">
-      <b>sh.xaytbayev@geo.uz / 1234 — Bosh Admin<br>
-      <b>nazoratchi@geo.uz / 1234 — Admin<br>
-      <b>alisher@geo.uz / 1234 — Nazoratchi
+      <b>admin@geo.uz</b> / 1234 — Admin<br>
+      <b>nazoratchi@geo.uz</b> / 1234 — Nazoratchi<br>
+      <b>alisher@geo.uz</b> / 1234 — Ishchi
     </div>
   </div>
 </div>
@@ -206,12 +206,12 @@ input:checked+.tog-sl:before{transform:translateX(19px);}
           <button class="btn btn-p" onclick="savePermissions()">💾 Saqlash</button>
         </div>
         <div style="display:flex;gap:9px;margin-bottom:18px">
-          <button class="btn btn-del" id="pt-supervisor" onclick="switchPermTab('supervisor')">🔶 Admin</button>
-          <button class="btn btn-s" id="pt-worker" onclick="switchPermTab('worker')" style="opacity:.5">👷 Nazoratchi</button>
+          <button class="btn btn-del" id="pt-supervisor" onclick="switchPermTab('supervisor')">🔶 Nazoratchi</button>
+          <button class="btn btn-s" id="pt-worker" onclick="switchPermTab('worker')" style="opacity:.5">👷 Ishchi</button>
         </div>
         <div id="permPanel-supervisor">
           <div class="card">
-            <div class="ch"><h3>🔶 Admin ruxsatlari</h3></div>
+            <div class="ch"><h3>🔶 Nazoratchi ruxsatlari</h3></div>
             <table class="perm-table">
               <thead><tr><th>Funksiya</th><th>Ruxsat</th></tr></thead>
               <tbody>
@@ -227,7 +227,7 @@ input:checked+.tog-sl:before{transform:translateX(19px);}
         </div>
         <div id="permPanel-worker" style="display:none">
           <div class="card">
-            <div class="ch"><h3>👷 Nazoratchi ruxsatlari</h3></div>
+            <div class="ch"><h3>👷 Ishchi ruxsatlari</h3></div>
             <table class="perm-table">
               <thead><tr><th>Funksiya</th><th>Ruxsat</th></tr></thead>
               <tbody>
@@ -296,7 +296,7 @@ input:checked+.tog-sl:before{transform:translateX(19px);}
             <div class="fg"><label>Nomi</label><input type="text" value="GeoWFM Corp"></div>
             <div class="fg"><label>Ish boshlanish</label><input type="time" value="09:00"></div>
             <div class="fg"><label>Ish tugash</label><input type="time" value="18:00"></div>
-            <div class="fg"><label>API URL</label><input type="text" id="apiUrlInput" value="http://localhost:3000/api"></div>
+            <div class="fg"><label>API URL</label><input type="text" id="apiUrlInput" value="https://geowfm-production.up.railway.app/api"></div>
             <button class="btn btn-p" onclick="saveSettings()">💾 Saqlash</button>
           </div>
           <div class="card" style="padding:20px">
@@ -312,7 +312,7 @@ input:checked+.tog-sl:before{transform:translateX(19px);}
 
       <!-- SUPERVISOR DASHBOARD -->
       <div class="page" id="page-supDashboard">
-        <div class="ph"><div><h2>🔶 Admin Paneli</h2><p id="supGroup">—</p></div>
+        <div class="ph"><div><h2>🔶 Nazoratchi Paneli</h2><p id="supGroup">—</p></div>
           <button class="btn btn-p" onclick="openModal('addTaskModal')">+ Vazifa</button>
         </div>
         <div class="sg">
@@ -325,14 +325,6 @@ input:checked+.tog-sl:before{transform:translateX(19px);}
           <div class="ch"><h3>👥 Guruh xodimlari</h3></div>
           <div id="supUserList"><div class="loading">Yuklanmoqda...</div></div>
         </div>
-      </div>
-
-      <!-- PROOFS -->
-      <div class="page" id="page-proofs">
-        <div class="ph"><div><h2>📸 Bajarilish dalillari</h2><p>Ishchilar yuborgan rasmlar</p></div>
-          <button class="btn btn-s" onclick="loadProofs()">🔄 Yangilash</button>
-        </div>
-        <div class="card"><div id="proofsListWrap"><div class="loading">Yuklanmoqda...</div></div></div>
       </div>
 
       <!-- WORKER HOME -->
@@ -380,9 +372,9 @@ input:checked+.tog-sl:before{transform:translateX(19px);}
       <div class="fg"><label>Parol</label><input type="password" id="nu-pass" placeholder="Kamida 4 belgi"></div>
       <div class="fg"><label>Rol</label>
         <select id="nu-role" onchange="updateRoleDesc()">
-          <option value="worker">👷 Nazoratchi</option>
-          <option value="supervisor">🔶 Admin</option>
-          <option value="admin">👑 Bosh Admin</option>
+          <option value="worker">👷 Ishchi</option>
+          <option value="supervisor">🔶 Nazoratchi</option>
+          <option value="admin">👑 Admin</option>
         </select>
       </div>
     </div>
@@ -396,7 +388,7 @@ input:checked+.tog-sl:before{transform:translateX(19px);}
     </div>
     <div class="fg"><label>Telefon</label><input type="tel" id="nu-phone" placeholder="+998 90 000 00 00"></div>
     <div style="background:var(--surface2);border-radius:9px;padding:12px;font-size:13px;color:var(--text2);line-height:1.6" id="roleDescBox">
-      👷 Nazoratchi: Faqat o'z vazifalari va davomat.
+      👷 Ishchi: Faqat o'z vazifalari va davomat.
     </div>
     <div class="mf">
       <button class="btn btn-s" onclick="closeModal('addUserModal')">Bekor</button>
@@ -413,9 +405,9 @@ input:checked+.tog-sl:before{transform:translateX(19px);}
       <div class="fg"><label>Ism Familiya</label><input type="text" id="eu-name"></div>
       <div class="fg"><label>Rol</label>
         <select id="eu-role">
-          <option value="worker">👷 Nazoratchi</option>
-          <option value="supervisor">🔶 Admin</option>
-          <option value="admin">👑 Bosh Admin</option>
+          <option value="worker">👷 Ishchi</option>
+          <option value="supervisor">🔶 Nazoratchi</option>
+          <option value="admin">👑 Admin</option>
         </select>
       </div>
     </div>
@@ -451,15 +443,7 @@ input:checked+.tog-sl:before{transform:translateX(19px);}
     </div>
     <div class="ir">
       <div class="fg"><label>Muddat</label><input type="datetime-local" id="nt-deadline"></div>
-      <div class="fg"><label>Joylashuv manzili</label><input type="text" id="nt-loc" placeholder="Ko'cha, bino nomi"></div>
-    </div>
-    <div style="background:var(--surface2);border-radius:10px;padding:13px;margin-bottom:13px">
-      <div style="font-size:12px;color:var(--text2);margin-bottom:8px">📍 Vazifa koordinatalari (GPS tekshiruv uchun)</div>
-      <div class="ir">
-        <div class="fg"><label>Kenglik (Lat)</label><input type="number" step="any" id="nt-lat" placeholder="41.2995"></div>
-        <div class="fg"><label>Uzunlik (Lng)</label><input type="number" step="any" id="nt-lng" placeholder="69.2401"></div>
-      </div>
-      <button class="btn btn-s" onclick="getTaskLocation()" style="font-size:12px;width:100%">📍 Hozirgi joylashuvni olish</button>
+      <div class="fg"><label>Joylashuv</label><input type="text" id="nt-loc" placeholder="Manzil"></div>
     </div>
     <div class="mf">
       <button class="btn btn-s" onclick="closeModal('addTaskModal')">Bekor</button>
@@ -470,42 +454,9 @@ input:checked+.tog-sl:before{transform:translateX(19px);}
 
 <div id="toast"></div>
 
-<!-- PROOF MODAL (ishchi uchun) -->
-<div class="modal-overlay" id="proofModal">
-  <div class="modal">
-    <h3>📸 Vazifa bajarilishini tasdiqlash</h3>
-    <input type="hidden" id="proof-task-id">
-    <div id="proof-gps-status" style="background:var(--surface2);border-radius:9px;padding:12px;margin-bottom:13px;font-size:13px;text-align:center">
-      📍 GPS aniqlanmoqda...
-    </div>
-    <div class="fg">
-      <label>📸 Rasm yuklash</label>
-      <input type="file" id="proof-image" accept="image/*" capture="environment" style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:10px;color:var(--text);width:100%">
-    </div>
-    <div id="proof-preview" style="display:none;margin-bottom:13px">
-      <img id="proof-img-preview" style="width:100%;border-radius:10px;max-height:200px;object-fit:cover">
-    </div>
-    <div class="fg"><label>Izoh</label><input type="text" id="proof-comment" placeholder="Qisqacha izoh..."></div>
-    <div id="proof-upload-status" style="display:none;text-align:center;padding:10px;color:var(--accent)">⏳ Yuklanmoqda...</div>
-    <div class="mf">
-      <button class="btn btn-s" onclick="closeModal('proofModal')">Bekor</button>
-      <button class="btn btn-p" id="proof-submit-btn" onclick="submitProof()">✅ Tasdiqlash</button>
-    </div>
-  </div>
-</div>
-
-<!-- PROOF VIEW MODAL (admin uchun) -->
-<div class="modal-overlay" id="proofViewModal">
-  <div class="modal">
-    <h3>📋 Bajarilish dalillari</h3>
-    <div id="proofViewContent"><div class="loading">Yuklanmoqda...</div></div>
-    <div class="mf"><button class="btn btn-s" onclick="closeModal('proofViewModal')">Yopish</button></div>
-  </div>
-</div>
-
 <script>
 // ─── Config ─────────────────────────────────────────────────
-let API = localStorage.getItem('apiUrl') || 'http://localhost:3000/api';
+let API = localStorage.getItem('apiUrl') || 'https://geowfm-production.up.railway.app/api';
 let TOKEN = localStorage.getItem('token') || '';
 let ME = JSON.parse(localStorage.getItem('me') || 'null');
 let checkedIn = false;
@@ -532,7 +483,6 @@ const NAVS = {
       {ic:'📊',txt:'Dashboard',pg:'dashboard'},
       {ic:'✅',txt:'Davomat',pg:'attendance'},
       {ic:'📋',txt:'Vazifalar',pg:'tasks'},
-      {ic:'📸',txt:'Bajarilish dalillari',pg:'proofs'},
     ]},
     { lbl:'Boshqaruv', items:[
       {ic:'👥',txt:'Foydalanuvchilar',pg:'users'},
@@ -547,7 +497,6 @@ const NAVS = {
       {ic:'📊',txt:'Dashboard',pg:'supDashboard'},
       {ic:'✅',txt:'Davomat',pg:'attendance'},
       {ic:'📋',txt:'Vazifalar',pg:'tasks'},
-      {ic:'📸',txt:'Bajarilish dalillari',pg:'proofs'},
       {ic:'📈',txt:'Hisobotlar',pg:'reports'},
       {ic:'🔔',txt:'Bildirishnomalar',pg:'notifications'},
     ]},
@@ -563,12 +512,12 @@ const NAVS = {
 };
 
 const ROLE_COLORS = {admin:'av-r',supervisor:'av-o',worker:'av-g'};
-const ROLE_LABELS = {admin:'👑 Bosh Admin',supervisor:'🔶 Admin',worker:'👷 Nazoratchi'};
+const ROLE_LABELS = {admin:'👑 Admin',supervisor:'🔶 Nazoratchi',worker:'👷 Ishchi'};
 const ROLE_HOME   = {admin:'dashboard',supervisor:'supDashboard',worker:'workerHome'};
 const ROLE_DESC   = {
-  worker:     '👷 Nazoratchi: Faqat o\'z vazifalari va davomat.',
-  supervisor: '🔶 Admin: O\'z guruhini kuzatadi, vazifa beradi.',
-  admin:      '👑 Bosh Admin: Barcha huquqlarga ega.',
+  worker:     '👷 Ishchi: Faqat o\'z vazifalari va davomat.',
+  supervisor: '🔶 Nazoratchi: O\'z guruhini kuzatadi, vazifa beradi.',
+  admin:      '👑 Admin: Barcha huquqlarga ega.',
 };
 const AVCOLORS = ['av-g','av-b','av-p','av-o','av-r'];
 
@@ -668,7 +617,6 @@ function showPage(pg) {
     workerHome:   loadWorkerTasks,
     myAttendance: loadMyAttendance,
     reports:      loadReports,
-    proofs:       loadProofs,
   };
   if (loaders[pg]) loaders[pg]();
 }
@@ -838,7 +786,6 @@ async function loadTasks() {
       </div>
       <span class="badge ${t.status==='done'?'success':t.status==='active'?'warning':'info'}">${t.status==='done'?'Bajarildi':t.status==='active'?'Jarayonda':'Kutilmoqda'}</span>
       <div style="display:flex;gap:5px;margin-left:8px">
-        ${t.status==='done'?`<button class="btn btn-s" onclick="viewTaskProof(${t.id})" style="font-size:11px">📸 Dalil</button>`:''}
         ${t.status!=='done'?`<button class="btn btn-ok" onclick="completeTask(${t.id})">✓</button>`:''}
         ${isManager?`<button class="btn btn-del" onclick="deleteTask(${t.id})">✕</button>`:''}
       </div>
@@ -854,28 +801,20 @@ async function loadWorkerTasks() {
   el.innerHTML = tasks.map(t => `
     <div class="task-item">
       <div class="tp" style="background:${pColors[t.priority]||'var(--accent)'}"></div>
-      <div class="ti">
-        <div class="tt">${t.title}</div>
-        <div class="tm">
-          ${t.deadline?`<span>📅 ${t.deadline.slice(0,16).replace('T',' ')}</span>`:''}
-          ${t.location?`<span>📍 ${t.location}</span>`:''}
-        </div>
-      </div>
+      <div class="ti"><div class="tt">${t.title}</div><div class="tm">${t.deadline?`<span>📅 ${t.deadline.slice(0,16).replace('T',' ')}</span>`:''}</div></div>
       <span class="badge ${t.status==='done'?'success':t.status==='active'?'warning':'info'}">${t.status==='done'?'Bajarildi ✓':t.status==='active'?'Jarayonda':'Kutilmoqda'}</span>
-      ${t.status!=='done'?`<button class="btn btn-ok" style="margin-left:8px" onclick="openProofModal(${t.id},${t.location_lat||'null'},${t.location_lng||'null'})">📸 Bajarildi</button>`:''}
+      ${t.status!=='done'?`<button class="btn btn-ok" style="margin-left:8px" onclick="completeTask(${t.id})">✓ Bajarildi</button>`:''}
     </div>`).join('');
 }
 
 async function addTask() {
   const body = {
-    title:        document.getElementById('nt-title').value,
-    description:  document.getElementById('nt-desc').value,
-    assigned_to:  document.getElementById('nt-user').value || null,
-    priority:     document.getElementById('nt-priority').value,
-    deadline:     document.getElementById('nt-deadline').value || null,
-    location:     document.getElementById('nt-loc').value,
-    location_lat: parseFloat(document.getElementById('nt-lat').value) || null,
-    location_lng: parseFloat(document.getElementById('nt-lng').value) || null,
+    title:       document.getElementById('nt-title').value,
+    description: document.getElementById('nt-desc').value,
+    assigned_to: document.getElementById('nt-user').value || null,
+    priority:    document.getElementById('nt-priority').value,
+    deadline:    document.getElementById('nt-deadline').value || null,
+    location:    document.getElementById('nt-loc').value,
   };
   if (!body.title) { showToast('❌ Vazifa nomi kerak!'); return; }
   const res = await api('POST', '/tasks', body);
@@ -885,178 +824,6 @@ async function addTask() {
   loadTasks();
   loadDashboard();
 }
-
-function getTaskLocation() {
-  if (!navigator.geolocation) { showToast('❌ GPS mavjud emas'); return; }
-  showToast('📍 Joylashuv aniqlanmoqda...');
-  navigator.geolocation.getCurrentPosition(p => {
-    document.getElementById('nt-lat').value = p.coords.latitude.toFixed(6);
-    document.getElementById('nt-lng').value = p.coords.longitude.toFixed(6);
-    showToast('✅ Koordinatlar olindi!');
-  }, () => showToast('❌ GPS aniqlanmadi'));
-}
-
-// Ikki nuqta orasidagi masofa (metrda)
-function calcDistance(lat1, lng1, lat2, lng2) {
-  const R = 6371000;
-  const dLat = (lat2-lat1)*Math.PI/180;
-  const dLng = (lng2-lng1)*Math.PI/180;
-  const a = Math.sin(dLat/2)**2 + Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLng/2)**2;
-  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-}
-
-// Ishchi vazifani bajarishga ochishi
-let currentProofLat = null, currentProofLng = null, currentTaskData = null;
-
-async function openProofModal(taskId, taskLat, taskLng) {
-  currentTaskData = { id: taskId, lat: taskLat, lng: taskLng };
-  currentProofLat = null; currentProofLng = null;
-  document.getElementById('proof-task-id').value = taskId;
-  document.getElementById('proof-comment').value = '';
-  document.getElementById('proof-preview').style.display = 'none';
-  document.getElementById('proof-upload-status').style.display = 'none';
-  document.getElementById('proof-submit-btn').disabled = true;
-
-  const statusEl = document.getElementById('proof-gps-status');
-
-  // Agar koordinat yo'q bo'lsa, to'g'ridan bajarish mumkin
-  if (!taskLat || !taskLng) {
-    statusEl.innerHTML = '✅ GPS tekshiruv shart emas — bajarishingiz mumkin';
-    statusEl.style.color = 'var(--success)';
-    document.getElementById('proof-submit-btn').disabled = false;
-    openModal('proofModal');
-    return;
-  }
-
-  statusEl.innerHTML = '📍 Joylashuvingiz aniqlanmoqda...';
-  statusEl.style.color = 'var(--accent)';
-  openModal('proofModal');
-
-  if (!navigator.geolocation) {
-    statusEl.innerHTML = '⚠️ GPS mavjud emas — bajarishingiz mumkin';
-    document.getElementById('proof-submit-btn').disabled = false;
-    return;
-  }
-
-  navigator.geolocation.getCurrentPosition(p => {
-    currentProofLat = p.coords.latitude;
-    currentProofLng = p.coords.longitude;
-    const dist = Math.round(calcDistance(currentProofLat, currentProofLng, taskLat, taskLng));
-
-    if (dist <= 300) {
-      statusEl.innerHTML = `✅ Siz vazifa joyidasiz! (${dist}m uzoqlikda)`;
-      statusEl.style.color = 'var(--success)';
-      document.getElementById('proof-submit-btn').disabled = false;
-    } else {
-      statusEl.innerHTML = `❌ Siz vazifa joyidan ${dist}m uzoqdasiz! (300m ichida bo'lish kerak)`;
-      statusEl.style.color = 'var(--danger)';
-      document.getElementById('proof-submit-btn').disabled = true;
-    }
-  }, () => {
-    statusEl.innerHTML = '⚠️ GPS aniqlanmadi — bajarishingiz mumkin';
-    statusEl.style.color = 'var(--warning)';
-    document.getElementById('proof-submit-btn').disabled = false;
-  }, { timeout: 10000 });
-
-  // Rasm preview
-  document.getElementById('proof-image').onchange = function() {
-    const file = this.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = e => {
-        document.getElementById('proof-img-preview').src = e.target.result;
-        document.getElementById('proof-preview').style.display = 'block';
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-}
-
-async function submitProof() {
-  const taskId = document.getElementById('proof-task-id').value;
-  const comment = document.getElementById('proof-comment').value;
-  const fileInput = document.getElementById('proof-image');
-  const statusEl = document.getElementById('proof-upload-status');
-  const btn = document.getElementById('proof-submit-btn');
-
-  btn.disabled = true;
-  statusEl.style.display = 'block';
-  statusEl.textContent = '⏳ Rasm yuklanmoqda...';
-
-  let imageUrl = '';
-
-  if (fileInput.files[0]) {
-    try {
-      const formData = new FormData();
-      formData.append('image', fileInput.files[0]);
-      formData.append('key', '3a4c5bc8792b94267c256baf1d486157');
-      const r = await fetch('https://api.imgbb.com/1/upload', { method:'POST', body:formData });
-      const d = await r.json();
-      if (d.success) imageUrl = d.data.url;
-      else { showToast('❌ Rasm yuklanmadi'); btn.disabled = false; return; }
-    } catch(e) {
-      showToast('❌ Rasm yuklashda xatolik'); btn.disabled = false; return;
-    }
-  }
-
-  statusEl.textContent = '⏳ Saqlanmoqda...';
-  const dist = (currentProofLat && currentTaskData?.lat)
-    ? Math.round(calcDistance(currentProofLat, currentProofLng, currentTaskData.lat, currentTaskData.lng))
-    : 0;
-
-  const res = await api('POST', `/tasks/${taskId}/proof`, {
-    image_url: imageUrl,
-    comment,
-    latitude: currentProofLat,
-    longitude: currentProofLng,
-    distance_to_task: dist
-  });
-
-  if (res.error) { showToast('❌ '+res.error); btn.disabled = false; return; }
-  statusEl.style.display = 'none';
-  closeModal('proofModal');
-  showToast('✅ Vazifa bajarildi va tasdiqlandi!');
-  loadWorkerTasks();
-  loadTasks();
-}
-
-// Admin/supervisor prooflarni ko'rish
-async function loadProofs() {
-  const el = document.getElementById('proofsListWrap');
-  if (!el) return;
-  el.innerHTML = '<div class="loading">Yuklanmoqda...</div>';
-  const proofs = await api('GET', '/proofs');
-  if (proofs.error) { el.innerHTML = `<div class="empty">${proofs.error}</div>`; return; }
-  if (!proofs.length) { el.innerHTML = '<div class="empty">Hali dalil yo\'q</div>'; return; }
-
-  el.innerHTML = proofs.map(p => `
-    <div style="padding:16px 20px;border-top:1px solid var(--border);display:flex;gap:14px;align-items:flex-start">
-      ${p.image_url ? `<img src="${p.image_url}" style="width:90px;height:90px;object-fit:cover;border-radius:10px;flex-shrink:0;cursor:pointer" onclick="window.open('${p.image_url}','_blank')">` : '<div style="width:90px;height:90px;background:var(--surface2);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0">📷</div>'}
-      <div style="flex:1">
-        <div style="font-size:14px;font-weight:600;margin-bottom:4px">${p.task_title||'—'}</div>
-        <div style="font-size:12px;color:var(--text2);margin-bottom:4px">👤 ${p.worker_name||'—'} • 📍 ${p.location||'—'}</div>
-        ${p.comment?`<div style="font-size:13px;margin-bottom:4px">💬 ${p.comment}</div>`:''}
-        <div style="font-size:11px;color:var(--text2)">
-          🕐 ${p.submitted_at?p.submitted_at.slice(0,16).replace('T',' '):'—'}
-          ${p.distance_to_task?` • 📏 ${p.distance_to_task}m uzoqlikda`:''}
-        </div>
-      </div>
-      <span class="badge success">✅ Bajarildi</span>
-    </div>`).join('');
-}
-
-async function viewTaskProof(taskId) {
-  openModal('proofViewModal');
-  const proofs = await api('GET', `/tasks/${taskId}/proof`);
-  const el = document.getElementById('proofViewContent');
-  if (!proofs.length) { el.innerHTML = '<div class="empty">Dalil yuklanmagan</div>'; return; }
-  el.innerHTML = proofs.map(p => `
-    <div style="margin-bottom:16px">
-      ${p.image_url?`<img src="${p.image_url}" style="width:100%;border-radius:10px;max-height:300px;object-fit:cover;cursor:pointer;margin-bottom:10px" onclick="window.open('${p.image_url}','_blank')">`:''}
-      <div style="font-size:13px;color:var(--text2)">👤 ${p.name} • 🕐 ${p.submitted_at?p.submitted_at.slice(0,16).replace('T',' '):'—'}</div>
-      ${p.comment?`<div style="font-size:13px;margin-top:5px">💬 ${p.comment}</div>`:''}
-      ${p.distance_to_task?`<div style="font-size:12px;color:var(--text2);margin-top:4px">📏 Vazifa joyidan ${p.distance_to_task}m uzoqlikda bajarilgan</div>`:''}
-    </div>`).join('');
 
 async function completeTask(id) {
   const res = await api('PUT', '/tasks/'+id, { status:'done' });
