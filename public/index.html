@@ -102,7 +102,7 @@ tr:hover td{background:rgba(255,255,255,.02);}
 .loading{text-align:center;padding:32px;color:var(--text2);}
 .empty{text-align:center;padding:40px;color:var(--text2);}
 #toast{position:fixed;bottom:20px;right:20px;background:var(--surface);border:1px solid var(--border);border-radius:11px;padding:12px 17px;font-size:14px;z-index:9999;display:none;box-shadow:0 8px 30px rgba(0,0,0,.5);max-width:300px;}
-.mob-toggle{display:none;position:fixed;top:13px;left:13px;z-index:200;background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:8px;cursor:pointer;font-size:18px;}
+.mob-toggle{display:none;position:fixed;top:13px;left:13px;z-index:200;background:rgba(0,212,255,0.15);border:2px solid rgba(0,212,255,0.5);border-radius:9px;padding:8px 11px;cursor:pointer;font-size:20px;color:var(--accent);box-shadow:0 0 12px rgba(0,212,255,0.2);}
 .checkin-card{background:linear-gradient(135deg,rgba(0,212,255,.05),rgba(124,58,237,.05));border:1px solid rgba(0,212,255,.2);border-radius:17px;padding:22px;text-align:center;margin-bottom:18px;}
 .ci-time{font-family:'Syne',sans-serif;font-size:46px;font-weight:800;color:var(--accent);letter-spacing:-2px;}
 .ci-date{font-size:13px;color:var(--text2);margin-bottom:13px;}
@@ -802,50 +802,78 @@ async function openProofModal(taskId, taskLat, taskLng) {
   const statusEl = document.getElementById('proof-gps-status');
   statusEl.style.color = 'var(--text2)';
 
-  if (!taskLat||!taskLng) {
-    statusEl.innerHTML = '✅ GPS tekshiruv shart emas — hisobot yuboring';
-    statusEl.style.color = 'var(--success)';
+  // Agar koordinat yo'q bo'lsa — GPS tekshiruvsiz o'tib ketish YO'Q
+  // Koordinat majburiy emas faqat test uchun
+  if (!taskLat || !taskLng) {
+    statusEl.innerHTML = '⚠️ Bu vazifada GPS koordinata belgilanmagan.<br>Hisobot yubora olasiz, lekin GPS tavsiya etiladi.';
+    statusEl.style.color = 'var(--warning)';
     document.getElementById('proof-submit-btn').disabled = false;
     openModal('proofModal'); return;
   }
-  statusEl.innerHTML = '📍 Joylashuvingiz aniqlanmoqda...';
+
+  // GPS bor — tekshirish MAJBURIY
+  statusEl.innerHTML = '📍 GPS aniqlanmoqda... Iltimos kuting';
+  statusEl.style.color = 'var(--accent)';
   openModal('proofModal');
 
   if (!navigator.geolocation) {
-    statusEl.innerHTML = '⚠️ GPS mavjud emas — hisobot yubora olasiz';
-    statusEl.style.color = 'var(--warning)';
-    document.getElementById('proof-submit-btn').disabled = false; return;
+    statusEl.innerHTML = '❌ Qurilmangizda GPS mavjud emas! Vazifani bajarib bo\'lmaydi.';
+    statusEl.style.color = 'var(--danger)';
+    document.getElementById('proof-submit-btn').disabled = true;
+    return;
   }
-  navigator.geolocation.getCurrentPosition(p=>{
-    currentProofLat = p.coords.latitude;
-    currentProofLng = p.coords.longitude;
-    const dist = Math.round(calcDist(currentProofLat,currentProofLng,taskLat,taskLng));
-    if (dist<=100) {
-      statusEl.innerHTML = '✅ Siz vazifa joyidasiz! ('+dist+'m uzoqlikda)';
-      statusEl.style.color = 'var(--success)';
-      document.getElementById('proof-submit-btn').disabled = false;
-    } else {
-      statusEl.innerHTML = '❌ Siz vazifa joyidan '+dist+'m uzoqdasiz!<br>Belgilangan joyga boring — 100m ichida bo\'lish kerak';
+
+  // GPS ni yoqishni kutish
+  navigator.geolocation.getCurrentPosition(
+    p => {
+      currentProofLat = p.coords.latitude;
+      currentProofLng = p.coords.longitude;
+      const dist = Math.round(calcDist(currentProofLat, currentProofLng, taskLat, taskLng));
+
+      if (dist <= 100) {
+        statusEl.innerHTML = '✅ GPS tasdiqlandi! Siz vazifa joyidasiz (' + dist + 'm uzoqlikda)';
+        statusEl.style.color = 'var(--success)';
+        document.getElementById('proof-submit-btn').disabled = false;
+      } else {
+        statusEl.innerHTML = '🚫 Siz hali vazifa joyida emassiz!\n📏 Uzoqlik: ' + dist + 'm\n✅ Kerakli radius: 100m\n\nBelgilangan joyga boring, keyin qayta urinib ko\'ring.';
+        statusEl.style.whiteSpace = 'pre-line';
+        statusEl.style.color = 'var(--danger)';
+        document.getElementById('proof-submit-btn').disabled = true;
+      }
+    },
+    err => {
+      let msg = '❌ GPS aniqlanmadi! ';
+      if (err.code === 1) msg += 'GPS ruxsati rad etildi. Sozlamalarda GPS ruxsat bering.';
+      else if (err.code === 2) msg += 'GPS signali yo\'q. Ochiq joyga chiqing.';
+      else msg += 'GPS xatolik. Qayta urinib ko\'ring.';
+      msg += '\n\n⚠️ GPS yoqilmasa vazifani bajarish MUMKIN EMAS.';
+      statusEl.innerHTML = msg;
+      statusEl.style.whiteSpace = 'pre-line';
       statusEl.style.color = 'var(--danger)';
       document.getElementById('proof-submit-btn').disabled = true;
-    }
-  }, ()=>{
-    statusEl.innerHTML = '⚠️ GPS aniqlanmadi — hisobot yubora olasiz';
-    statusEl.style.color = 'var(--warning)';
-    document.getElementById('proof-submit-btn').disabled = false;
-  }, {timeout:12000, enableHighAccuracy:true});
+
+      // Qayta urinish tugmasi
+      statusEl.innerHTML += '<br><br><button class="btn btn-warn" onclick="retryGPS(' + taskId + ',' + taskLat + ',' + taskLng + ')" style="width:100%;margin-top:6px">🔄 GPS ni qayta tekshirish</button>';
+    },
+    { timeout: 15000, enableHighAccuracy: true, maximumAge: 0 }
+  );
 
   document.getElementById('proof-image').onchange = function() {
     const file = this.files[0];
     if (file) {
       const reader = new FileReader();
-      reader.onload = e=>{
-        document.getElementById('proof-img-preview').src=e.target.result;
-        document.getElementById('proof-preview').style.display='block';
+      reader.onload = e => {
+        document.getElementById('proof-img-preview').src = e.target.result;
+        document.getElementById('proof-preview').style.display = 'block';
       };
       reader.readAsDataURL(file);
     }
   };
+}
+
+function retryGPS(taskId, taskLat, taskLng) {
+  closeModal('proofModal');
+  setTimeout(() => openProofModal(taskId, taskLat, taskLng), 300);
 }
 
 async function submitProof() {
