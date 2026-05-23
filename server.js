@@ -186,27 +186,37 @@ async function start() {
   });
 
   // --- ATTENDANCE ---
+  function nowUZ() {
+    const now = new Date();
+    const uz = new Date(now.getTime() + 5*60*60*1000);
+    return uz.toISOString().replace('Z','').split('.')[0];
+  }
+  function todayUZ() { return nowUZ().split('T')[0]; }
+
   app.post('/api/attendance/checkin', auth, (req, res) => {
     const { latitude, longitude, location_name } = req.body;
-    const today = new Date().toISOString().split('T')[0];
+    const today = todayUZ();
     if (get('SELECT id FROM attendance WHERE user_id=? AND date=?', [req.user.id, today]))
-      return res.status(400).json({ error: 'Already checked in today' });
-    const now = new Date().toISOString();
-    const ws = new Date(); ws.setHours(9,0,0,0);
-    const status = new Date() > ws ? 'late' : 'present';
+      return res.status(400).json({ error: 'Bugun allaqachon kirdingiz' });
+    const now = nowUZ();
+    const hour = parseInt(now.split('T')[1].split(':')[0]);
+    const min  = parseInt(now.split('T')[1].split(':')[1]);
+    const status = (hour > 9 || (hour === 9 && min > 0)) ? 'late' : 'present';
     run('INSERT INTO attendance (user_id,check_in,check_in_lat,check_in_lng,location_name,date,status) VALUES (?,?,?,?,?,?,?)',
       [req.user.id, now, latitude||0, longitude||0, location_name||'Unknown', today, status]);
-    res.json({ check_in:now, status });
+    res.json({ check_in: now, status });
   });
 
   app.post('/api/attendance/checkout', auth, (req, res) => {
-    const today = new Date().toISOString().split('T')[0];
+    const today = todayUZ();
     const rec = get('SELECT * FROM attendance WHERE user_id=? AND date=? AND check_out IS NULL', [req.user.id, today]);
-    if (!rec) return res.status(400).json({ error: 'Not checked in' });
-    const now = new Date();
-    const hours = ((now - new Date(rec.check_in))/3600000).toFixed(2);
-    run('UPDATE attendance SET check_out=?,work_hours=? WHERE id=?', [now.toISOString(), hours, rec.id]);
-    res.json({ work_hours:hours });
+    if (!rec) return res.status(400).json({ error: 'Kirish qilinmagan' });
+    const now = nowUZ();
+    const inTime = new Date(rec.check_in.replace('T',' ')+'Z');
+    const outTime = new Date(now.replace('T',' ')+'Z');
+    const hours = ((outTime - inTime)/3600000).toFixed(2);
+    run('UPDATE attendance SET check_out=?,work_hours=? WHERE id=?', [now, hours, rec.id]);
+    res.json({ work_hours: hours });
   });
 
   app.get('/api/attendance', auth, (req, res) => {
