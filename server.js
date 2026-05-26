@@ -12,20 +12,33 @@ const SECRET = 'geowfm2024';
 const DB_FILE = path.join(process.cwd(), 'geowfm.db');
 
 app.use(cors());
-app.use(express.json());
+app.use(express.json({ limit: '10mb' }));
 app.use(express.static(path.join(process.cwd(), 'public')));
-app.get('/', (req, res) => res.sendFile(path.join(process.cwd(), 'public', 'index.html')));
+
+// Healthcheck - Railway uchun
+app.get('/health', (req, res) => res.json({ status: 'ok', time: nowUZ() }));
+app.get('/', (req, res) => {
+  const indexPath = path.join(process.cwd(), 'public', 'index.html');
+  if (fs.existsSync(indexPath)) {
+    res.sendFile(indexPath);
+  } else {
+    res.send('<h1>GeoWFM</h1><p>index.html topilmadi: ' + indexPath + '</p>');
+  }
+});
 
 let db;
-function save() { fs.writeFileSync(DB_FILE, Buffer.from(db.export())); }
-function run(sql, p=[]) { db.run(sql, p); save(); }
+function save() {
+  try { fs.writeFileSync(DB_FILE, Buffer.from(db.export())); } catch(e) { console.error('Save error:', e.message); }
+}
+function run(sql, p=[]) { try { db.run(sql, p); save(); } catch(e) { console.error('Run error:', e.message, sql.slice(0,50)); } }
 function all(sql, p=[]) {
-  const s = db.prepare(sql); s.bind(p);
-  const rows = []; while (s.step()) rows.push(s.getAsObject()); s.free(); return rows;
+  try {
+    const s = db.prepare(sql); s.bind(p);
+    const rows = []; while (s.step()) rows.push(s.getAsObject()); s.free(); return rows;
+  } catch(e) { console.error('All error:', e.message); return []; }
 }
 function get(sql, p=[]) { return all(sql, p)[0] || null; }
 
-// O'zbekiston vaqti UTC+5
 function nowUZ() {
   const uz = new Date(Date.now() + 5*60*60*1000);
   return uz.toISOString().slice(0,19).replace('T',' ');
@@ -35,12 +48,19 @@ function uzHour() { return parseInt(nowUZ().slice(11,13)); }
 function uzMin()  { return parseInt(nowUZ().slice(14,16)); }
 
 async function start() {
-  const SQL = await initSqlJs();
-  db = fs.existsSync(DB_FILE)
-    ? new SQL.Database(fs.readFileSync(DB_FILE))
-    : new SQL.Database();
+  console.log('GeoWFM starting...');
+  
+  try {
+    const SQL = await initSqlJs();
+    db = fs.existsSync(DB_FILE)
+      ? new SQL.Database(fs.readFileSync(DB_FILE))
+      : new SQL.Database();
+    console.log('DB initialized');
+  } catch(e) {
+    console.error('DB init error:', e.message);
+    process.exit(1);
+  }
 
-  // Jadvallar
   run(`CREATE TABLE IF NOT EXISTS users (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT, email TEXT UNIQUE, password TEXT,
@@ -77,12 +97,10 @@ async function start() {
     is_read INTEGER DEFAULT 0, created_at TEXT
   )`);
 
-  // Demo foydalanuvchilar
   const adminExists = get('SELECT id FROM users WHERE email=?', ['sh.xaytbayev@geo.uz']);
-  const oldUser = get('SELECT id FROM users WHERE email=?', ['admin@geo.uz']);
-  if (!adminExists || oldUser) {
-    run('DELETE FROM users');
+  if (!adminExists) {
     const h = p => bcrypt.hashSync(p, 10);
+    run('DELETE FROM users');
     [
       ['Shoniyor Xaytbayev','sh.xaytbayev@geo.uz',h('1234'),'admin','Bosh Admin','Rahbariyat'],
       ['Shukur Teshaboyev','sh.teshaboyev@geo.uz',h('1234'),'supervisor','Rahbar','Rahbariyat'],
@@ -91,10 +109,9 @@ async function start() {
       'INSERT OR IGNORE INTO users (name,email,password,role,position,group_name,created_at) VALUES (?,?,?,?,?,?,?)',
       [...u, nowUZ()]
     ));
-    console.log('Demo data yaratildi');
+    console.log('Demo users created');
   }
 
-  // Middleware
   function auth(req, res, next) {
     const t = req.headers.authorization?.split(' ')[1];
     if (!t) return res.status(401).json({ error: 'Token kerak' });
@@ -111,22 +128,22 @@ async function start() {
     next();
   }
 
-  // ─── AUTH ────────────────────────────────────────────────────
   app.post('/api/auth/login', (req, res) => {
-    const { email, password } = req.body;
-    const u = get('SELECT * FROM users WHERE email=?', [email]);
-    if (!u || !bcrypt.compareSync(password, u.password))
-      return res.status(401).json({ error: 'Email yoki parol noto\'g\'ri' });
-    if (u.status === 'blocked')
-      return res.status(403).json({ error: 'Akkaunt bloklangan' });
-    const token = jwt.sign(
-      { id:u.id, email:u.email, role:u.role, name:u.name, group:u.group_name },
-      SECRET, { expiresIn:'24h' }
-    );
-    res.json({ token, user:{ id:u.id, name:u.name, email:u.email, role:u.role, position:u.position, group:u.group_name } });
+    try {
+      const { email, password } = req.body;
+      const u = get('SELECT * FROM users WHERE email=?', [email]);
+      if (!u || !bcrypt.compareSync(password, u.password))
+        return res.status(401).json({ error: 'Email yoki parol noto\'g\'ri' });
+      if (u.status === 'blocked')
+        return res.status(403).json({ error: 'Akkaunt bloklangan' });
+      const token = jwt.sign(
+        { id:u.id, email:u.email, role:u.role, name:u.name, group:u.group_name },
+        SECRET, { expiresIn:'24h' }
+      );
+      res.json({ token, user:{ id:u.id, name:u.name, email:u.email, role:u.role, position:u.position, group:u.group_name } });
+    } catch(e) { res.status(500).json({ error: e.message }); }
   });
 
-  // ─── USERS ───────────────────────────────────────────────────
   app.get('/api/users', auth, adminOrSup, (req, res) => {
     if (req.user.role === 'admin')
       return res.json(all('SELECT id,name,email,role,position,group_name,phone,status FROM users ORDER BY role,name'));
@@ -140,7 +157,7 @@ async function start() {
       run('INSERT INTO users (name,email,password,role,position,group_name,phone,created_at) VALUES (?,?,?,?,?,?,?,?)',
         [name, email, bcrypt.hashSync(password,10), role||'worker', position||'', group_name||'', phone||'', nowUZ()]);
       res.json({ message: 'Created' });
-    } catch { res.status(400).json({ error: 'Bu email allaqachon mavjud' }); }
+    } catch(e) { res.status(400).json({ error: 'Bu email allaqachon mavjud' }); }
   });
 
   app.put('/api/users/:id', auth, adminOnly, (req, res) => {
@@ -161,7 +178,6 @@ async function start() {
     res.json({ message: 'Deleted' });
   });
 
-  // ─── ATTENDANCE ──────────────────────────────────────────────
   app.post('/api/attendance/checkin', auth, (req, res) => {
     const { latitude, longitude, location_name } = req.body;
     const today = todayUZ();
@@ -196,7 +212,6 @@ async function start() {
     res.json(all(q + ' ORDER BY a.check_in DESC LIMIT 200', p));
   });
 
-  // ─── TASKS ───────────────────────────────────────────────────
   app.get('/api/tasks', auth, (req, res) => {
     const { status } = req.query;
     let q = 'SELECT t.*,u.name as assigned_name FROM tasks t LEFT JOIN users u ON t.assigned_to=u.id WHERE 1=1';
@@ -211,8 +226,6 @@ async function start() {
     const { title, description, assigned_to, priority, location, location_lat, location_lng, deadline } = req.body;
     if (!title) return res.status(400).json({ error: 'Vazifa nomi kerak' });
     const now = nowUZ();
-
-    // Barcha xodimlarga yuborish
     if (assigned_to === 'all') {
       const workers = all('SELECT id FROM users WHERE role=?', ['worker']);
       workers.forEach(w => {
@@ -221,7 +234,6 @@ async function start() {
       });
       return res.json({ message: 'Barcha xodimlarga yuborildi', count: workers.length });
     }
-
     run('INSERT INTO tasks (title,description,assigned_to,created_by,priority,location,location_lat,location_lng,deadline,created_at) VALUES (?,?,?,?,?,?,?,?,?,?)',
       [title, description||'', assigned_to||null, req.user.id, priority||'medium', location||'', location_lat||null, location_lng||null, deadline||null, now]);
     res.json({ message: 'Created' });
@@ -241,7 +253,6 @@ async function start() {
     res.json({ message: 'Deleted' });
   });
 
-  // ─── TASK PROOFS ─────────────────────────────────────────────
   app.post('/api/tasks/:id/proof', auth, (req, res) => {
     const { image_url, comment, latitude, longitude, distance_to_task } = req.body;
     const task = get('SELECT * FROM tasks WHERE id=?', [req.params.id]);
@@ -254,7 +265,7 @@ async function start() {
   });
 
   app.get('/api/tasks/:id/proof', auth, adminOrSup, (req, res) => {
-    res.json(all('SELECT p.*,u.name FROM task_proofs p JOIN users u ON p.user_id=u.id WHERE p.task_id=? ORDER BY p.submitted_at DESC', [req.params.id]));
+    res.json(all('SELECT p.*,u.name FROM task_proofs p JOIN users u ON p.user_id=u.id WHERE p.task_id=?', [req.params.id]));
   });
 
   app.get('/api/proofs', auth, adminOrSup, (req, res) => {
@@ -265,13 +276,11 @@ async function start() {
     res.json(all(q + ' ORDER BY p.submitted_at DESC LIMIT 100', params));
   });
 
-  // ─── DAILY WORK ──────────────────────────────────────────────
   app.post('/api/daily-work', auth, adminOrSup, (req, res) => {
     const { date, works, notes, image_url, summary } = req.body;
     if (!date || !works?.length) return res.status(400).json({ error: 'Sana va ishlar kerak' });
-    const now = nowUZ();
     run('INSERT INTO daily_work (user_id,date,works,notes,image_url,summary,created_at) VALUES (?,?,?,?,?,?,?)',
-      [req.user.id, date, JSON.stringify(works), notes||'', image_url||'', summary||'', now]);
+      [req.user.id, date, JSON.stringify(works), notes||'', image_url||'', summary||'', nowUZ()]);
     res.json({ message: 'Saved' });
   });
 
@@ -282,39 +291,42 @@ async function start() {
     res.json(all(q + ' ORDER BY dw.created_at DESC LIMIT 100', p));
   });
 
-  // ─── NOTIFICATIONS ───────────────────────────────────────────
   app.get('/api/notifications', auth, (req, res) => {
     res.json(all('SELECT * FROM notifications WHERE user_id=? OR user_id IS NULL ORDER BY created_at DESC LIMIT 50', [req.user.id]));
   });
 
-  // ─── DASHBOARD ───────────────────────────────────────────────
   app.get('/api/dashboard', auth, (req, res) => {
     const today = todayUZ();
-    let wQ = 'SELECT COUNT(*) as c FROM users WHERE role="worker"';
-    let pQ = `SELECT COUNT(*) as c FROM attendance WHERE date=? AND check_in IS NOT NULL`;
-    let aQ = 'SELECT COUNT(*) as c FROM tasks WHERE status IN ("pending","active")';
-    let dQ = 'SELECT COUNT(*) as c FROM tasks WHERE status="done"';
     const isSup = req.user.role === 'supervisor';
-    if (isSup) {
-      wQ += ' AND group_name=?';
-      pQ += ' AND user_id IN (SELECT id FROM users WHERE group_name=?)';
-      aQ += ' AND assigned_to IN (SELECT id FROM users WHERE group_name=?)';
-      dQ += ' AND assigned_to IN (SELECT id FROM users WHERE group_name=?)';
-    }
     const g = isSup ? [req.user.group] : [];
+    let wQ = 'SELECT COUNT(*) as c FROM users WHERE role="worker"' + (isSup?' AND group_name=?':'');
+    let pQ = `SELECT COUNT(*) as c FROM attendance WHERE date=? AND check_in IS NOT NULL` + (isSup?' AND user_id IN (SELECT id FROM users WHERE group_name=?)':'');
+    let aQ = 'SELECT COUNT(*) as c FROM tasks WHERE status IN ("pending","active")' + (isSup?' AND assigned_to IN (SELECT id FROM users WHERE group_name=?)':'');
+    let dQ = 'SELECT COUNT(*) as c FROM tasks WHERE status="done"' + (isSup?' AND assigned_to IN (SELECT id FROM users WHERE group_name=?)':'');
     res.json({
       totalWorkers: get(wQ, g).c,
-      presentToday: get(pQ, isSup ? [today, req.user.group] : [today]).c,
+      presentToday: get(pQ, isSup?[today,...g]:[today]).c,
       activeTasks:  get(aQ, g).c,
       doneTasks:    get(dQ, g).c,
     });
   });
 
+  // Barcha noma'lum routelar uchun index.html
+  app.get('*', (req, res) => {
+    if (req.path.startsWith('/api/')) return res.status(404).json({ error: 'Not found' });
+    const indexPath = path.join(process.cwd(), 'public', 'index.html');
+    if (fs.existsSync(indexPath)) res.sendFile(indexPath);
+    else res.status(404).send('index.html topilmadi');
+  });
+
   app.listen(PORT, '0.0.0.0', () => {
-    console.log('GeoWFM ishga tushdi — UTC+5 (O\'zbekiston)');
-    console.log('Hozirgi vaqt:', nowUZ());
+    console.log(`GeoWFM port ${PORT} da ishlayapti`);
+    console.log('UTC+5 (O\'zbekiston) vaqti:', nowUZ());
     console.log('sh.xaytbayev@geo.uz / 1234');
   });
 }
 
-start().catch(console.error);
+start().catch(e => {
+  console.error('FATAL ERROR:', e.message);
+  process.exit(1);
+});
