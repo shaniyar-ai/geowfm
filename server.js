@@ -43,8 +43,10 @@ function get(sql, p=[]) { return all(sql, p)[0] || null; }
 // ── SERVER DARHOL ISHGA TUSHADI ──────────────────────────────
 // DB tayyor bo'lishini kutmasdan port ni tinglaydi
 app.listen(PORT, '0.0.0.0', () => {
-  console.log(`GeoWFM port ${PORT} da ishlayapti`);
-  console.log('UTC+5 vaqti:', nowUZ());
+  console.log(`✅ GeoWFM port ${PORT} da ishlayapti`);
+  console.log(`✅ UTC+5 vaqti: ${nowUZ()}`);
+  console.log(`✅ Public papka: ${path.join(process.cwd(), 'public')}`);
+  console.log(`✅ index.html: ${require('fs').existsSync(path.join(process.cwd(), 'public', 'index.html')) ? 'MAVJUD' : 'YO\'Q!'}`);
 });
 
 // Health check
@@ -55,8 +57,11 @@ app.get('/health', (req, res) => {
 // Index route
 app.get('/', (req, res) => {
   const p = path.join(process.cwd(), 'public', 'index.html');
-  if (fs.existsSync(p)) res.sendFile(p);
-  else res.send('<!DOCTYPE html><html><body><h2>GeoWFM - DB yuklanmoqda...</h2><script>setTimeout(()=>location.reload(),2000)</script></body></html>');
+  if (fs.existsSync(p)) {
+    res.sendFile(p);
+  } else {
+    res.status(200).send('<!DOCTYPE html><html><head><title>GeoWFM</title></head><body style="font-family:sans-serif;text-align:center;padding:50px"><h2>GeoWFM yuklanmoqda...</h2><p>Iltimos kuting</p><script>setTimeout(()=>location.reload(),3000)</script></body></html>');
+  }
 });
 
 // DB tayyor bo'lishini kutuvchi middleware
@@ -291,6 +296,9 @@ async function initDB() {
     console.log('✅ DB tayyor!');
   } catch(e) {
     console.error('❌ DB xato:', e.message);
+    console.error('Stack:', e.stack);
+    // DB xato bo'lsa ham server ishlashda davom etadi
+    // Foydalanuvchilar "yuklanmoqda" xabarini ko'radi
   }
 }
 
