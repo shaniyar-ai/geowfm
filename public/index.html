@@ -574,7 +574,7 @@ tr:hover td{background:var(--hover);}
       <div class="fg"><label>Manzil (matn)</label><input type="text" id="nt-loc" placeholder="Ko'cha, bino nomi"></div>
     </div>
     <div class="info-box">
-      <div style="font-size:12px;color:var(--text2);margin-bottom:8px">🗺️ Xaritadan aniq joy tanlang — elektromontyor 100m ichida bo'lishi kerak</div>
+      <div style="font-size:12px;color:var(--text2);margin-bottom:8px">🗺️ Xaritadan aniq joy tanlang — elektromontyor 10m ichida bo'lishi kerak</div>
       <div class="ir" style="margin-bottom:8px">
         <div class="fg"><label>Kenglik (Lat)</label><input type="number" step="any" id="nt-lat" placeholder="41.2995" oninput="updateTaskPin()"></div>
         <div class="fg"><label>Uzunlik (Lng)</label><input type="number" step="any" id="nt-lng" placeholder="69.2401" oninput="updateTaskPin()"></div>
@@ -1102,7 +1102,7 @@ function updateTaskPin() {
   if (taskMarker) taskMap.removeLayer(taskMarker);
   if (taskCircle) taskMap.removeLayer(taskCircle);
   taskMarker = L.marker([lat,lng]).addTo(taskMap).bindPopup('📍 Vazifa joyi').openPopup();
-  taskCircle = L.circle([lat,lng],{radius:100,color:'#2563eb',fillColor:'#2563eb',fillOpacity:0.15}).addTo(taskMap);
+  taskCircle = L.circle([lat,lng],{radius:10,color:'#2563eb',fillColor:'#2563eb',fillOpacity:0.15}).addTo(taskMap);
   taskMap.setView([lat,lng],16);
   document.getElementById('taskMapInfo').style.display='block';
 }
@@ -1162,7 +1162,7 @@ async function loadWorkerTasks() {
           ${t.location?'<span>📍 '+t.location+'</span>':''}
         </div>
         ${t.description?'<div style="font-size:12px;color:var(--text2);margin-top:4px;padding:6px 10px;background:rgba(255,255,255,.05);border-radius:7px">📋 '+t.description+'</div>':''}
-        ${t.location_lat?'<div style="font-size:12px;color:var(--accent);margin-top:5px;padding:5px 10px;background:var(--accent-light);border-radius:7px">🗺️ '+parseFloat(t.location_lat).toFixed(5)+', '+parseFloat(t.location_lng).toFixed(5)+' — 100m radius</div>':''}
+        ${t.location_lat?'<div style="font-size:12px;color:var(--accent);margin-top:5px;padding:5px 10px;background:var(--accent-light);border-radius:7px">🗺️ '+parseFloat(t.location_lat).toFixed(5)+', '+parseFloat(t.location_lng).toFixed(5)+' — 10m radius</div>':''}
       </div>
       <span class="badge ${t.status==='done'?'success':'info'}">${t.status==='done'?'✅ Bajarildi':'Kutilmoqda'}</span>
       ${t.status!=='done'?'<button class="btn btn-ok" style="margin-left:8px;white-space:nowrap" onclick="openProofModal('+t.id+','+(t.location_lat||'null')+','+(t.location_lng||'null')+')">📸 Hisobot</button>':''}
@@ -1236,12 +1236,12 @@ async function openProofModal(taskId, taskLat, taskLng) {
     currentProofLat=p.coords.latitude;
     currentProofLng=p.coords.longitude;
     const dist=Math.round(calcDist(currentProofLat,currentProofLng,taskLat,taskLng));
-    if (dist<=100) {
+    if (dist<=10) {
       statusEl.innerHTML='✅ GPS tasdiqlandi! Siz vazifa joyidasiz ('+dist+'m uzoqlikda)';
       statusEl.style.color='var(--success)';
       document.getElementById('proof-submit-btn').disabled=false;
     } else {
-      statusEl.innerHTML='🚫 Siz vazifa joyidan '+dist+'m uzoqdasiz!\n✅ Kerakli masofa: 100m\n\nBelgilangan joyga boring.';
+      statusEl.innerHTML='🚫 Siz vazifa joyidan '+dist+'m uzoqdasiz!\n✅ Kerakli masofa: 10m\n\nBelgilangan joyga boring.';
       statusEl.style.whiteSpace='pre-line';
       statusEl.style.color='var(--danger)';
       statusEl.innerHTML+='<br><br><button class="btn btn-warn" onclick="retryGPS('+taskId+','+taskLat+','+taskLng+')" style="width:100%;margin-top:6px">🔄 Qayta tekshirish</button>';
