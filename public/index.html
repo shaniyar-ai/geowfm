@@ -305,15 +305,11 @@ tr:hover td{background:var(--hover);}
       <div class="logo-icon">🌐</div>
       <div><h1>Geo<span>WFM</span></h1></div>
     </div>
-    <div class="fg"><label>Email / Login</label><input type="text" id="lEmail" value="sh.xaytbayev@geo.uz"></div>
-    <div class="fg"><label>Parol</label><input type="password" id="lPass" value="1234" onkeydown="if(event.key==='Enter')doLogin()"></div>
+    <div class="fg"><label>Email / Login</label><input type="text" id="lEmail" placeholder="Email yoki login"></div>
+    <div class="fg"><label>Parol</label><input type="password" id="lPass" placeholder="Parol" onkeydown="if(event.key==='Enter')doLogin()"></div>
     <button class="btn-login" onclick="doLogin()">Kirish →</button>
     <div class="err-msg" id="loginErr">Email yoki parol noto'g'ri!</div>
-    <div class="demo-hint">
-      <b>sh.xaytbayev@geo.uz</b> / 1234 — Bosh Admin<br>
-      <b>sh.teshaboyev@geo.uz</b> / 1234 — Admin<br>
-      <b>a.muratov@geo.uz</b> / 1234 — Elektromontyor
-    </div>
+
   </div>
 </div>
 
@@ -514,25 +510,44 @@ tr:hover td{background:var(--hover);}
   <div class="modal">
     <h3>👤 Xodim qo'shish</h3>
     <div class="ir">
-      <div class="fg"><label>Ism Familiya</label><input type="text" id="nu-name" placeholder="To'liq ism"></div>
+      <div class="fg"><label>Familiya</label><input type="text" id="nu-surname" placeholder="Familiya"></div>
+      <div class="fg"><label>Ism</label><input type="text" id="nu-firstname" placeholder="Ism"></div>
+    </div>
+    <div class="ir">
+      <div class="fg"><label>Sharif</label><input type="text" id="nu-middlename" placeholder="Sharif (otasining ismi)"></div>
+      <div class="fg"><label>JSHSHIR / Pasport ID</label><input type="text" id="nu-jshshir" placeholder="12345678901234" maxlength="14"></div>
+    </div>
+    <div class="ir">
       <div class="fg"><label>Email / Login</label><input type="email" id="nu-email" placeholder="email@geo.uz"></div>
     </div>
     <div class="ir">
       <div class="fg"><label>Parol</label><input type="password" id="nu-pass" placeholder="Kamida 4 belgi"></div>
-      <div class="fg"><label>Rol</label>
-        <select id="nu-role" onchange="updateRoleDesc()">
-          <option value="worker">⚡ Elektromontyor</option>
-          <option value="supervisor">🔶 Admin</option>
-          <option value="admin">👑 Bosh Admin</option>
-        </select>
-      </div>
+<input type="hidden" id="nu-role" value="">
     </div>
     <div class="ir">
-      <div class="fg"><label>Lavozim</label><input type="text" id="nu-pos" placeholder="Lavozim"></div>
-      <div class="fg"><label>Guruh</label><select id="nu-group"><option>Rahbariyat</option><option>Xodimlar</option></select></div>
+      <div class="fg"><label>Lavozim</label>
+        <select id="nu-pos">
+          <option value="">Tanlang...</option>
+          <option value="Bosh muhandis">Bosh muhandis</option>
+          <option value="Oliy toifali muhandis">Oliy toifali muhandis</option>
+          <option value="Yetakchi muhandis">Yetakchi muhandis</option>
+          <option value="Guruh boshlig'i">Guruh boshlig'i</option>
+          <option value="1-toifali muhandis">1-toifali muhandis</option>
+          <option value="2-toifali muhandis">2-toifali muhandis</option>
+          <option value="Elektromontyor">Elektromontyor</option>
+        </select>
+      </div>
+      <div class="fg"><label>Guruh</label><select id="nu-group"><option>Magistral Transport tarmog'i guruhi</option>
+<option>Nurafshon LKX guruhi</option>
+<option>Bo'ka LKX guruhi</option>
+<option>Zafar LKX guruhi</option>
+<option>Bekobod LKX guruhi</option>
+<option>Oqqo'rg'on LKX guruhi</option>
+<option>TX va P guruhi</option>
+<option>Moddiy va ombor hisobi guruhi</option></select></div>
     </div>
     <div class="fg"><label>Telefon</label><input type="tel" id="nu-phone" placeholder="+998 90 000 00 00"></div>
-    <div class="info-box" id="roleDescBox">⚡ Elektromontyor: Faqat o'z vazifalari va davomat.</div>
+
     <div class="mf"><button class="btn btn-s" onclick="closeModal('addUserModal')">Bekor</button><button class="btn btn-p" onclick="addUser()">✓ Saqlash</button></div>
   </div>
 </div>
@@ -543,12 +558,38 @@ tr:hover td{background:var(--hover);}
     <h3>✏️ Xodimni tahrirlash</h3>
     <input type="hidden" id="eu-id">
     <div class="ir">
-      <div class="fg"><label>Ism Familiya</label><input type="text" id="eu-name"></div>
-      <div class="fg"><label>Rol</label><select id="eu-role"><option value="worker">⚡ Elektromontyor</option><option value="supervisor">🔶 Admin</option><option value="admin">👑 Bosh Admin</option></select></div>
+      <div class="fg"><label>Familiya</label><input type="text" id="eu-surname" placeholder="Familiya"></div>
+      <div class="fg"><label>Ism</label><input type="text" id="eu-firstname" placeholder="Ism"></div>
     </div>
     <div class="ir">
-      <div class="fg"><label>Lavozim</label><input type="text" id="eu-pos"></div>
-      <div class="fg"><label>Guruh</label><select id="eu-group"><option>Rahbariyat</option><option>Xodimlar</option></select></div>
+      <div class="fg"><label>Sharif</label><input type="text" id="eu-middlename" placeholder="Sharif"></div>
+      <div class="fg"><label>JSHSHIR / Pasport ID</label><input type="text" id="eu-jshshir" placeholder="12345678901234" maxlength="14"></div>
+    </div>
+    <div class="ir">
+      <div class="fg"><label>placeholder</label><input type="hidden" id="eu-name"></div>
+      <input type="hidden" id="eu-role" value="worker">
+    </div>
+    <div class="ir">
+      <div class="fg"><label>Lavozim</label>
+        <select id="eu-pos">
+          <option value="">Tanlang...</option>
+          <option value="Bosh muhandis">Bosh muhandis</option>
+          <option value="Oliy toifali muhandis">Oliy toifali muhandis</option>
+          <option value="Yetakchi muhandis">Yetakchi muhandis</option>
+          <option value="Guruh boshlig'i">Guruh boshlig'i</option>
+          <option value="1-toifali muhandis">1-toifali muhandis</option>
+          <option value="2-toifali muhandis">2-toifali muhandis</option>
+          <option value="Elektromontyor">Elektromontyor</option>
+        </select>
+      </div>
+      <div class="fg"><label>Guruh</label><select id="eu-group"><option>Magistral Transport tarmog'i guruhi</option>
+<option>Nurafshon LKX guruhi</option>
+<option>Bo'ka LKX guruhi</option>
+<option>Zafar LKX guruhi</option>
+<option>Bekobod LKX guruhi</option>
+<option>Oqqo'rg'on LKX guruhi</option>
+<option>TX va P guruhi</option>
+<option>Moddiy va ombor hisobi guruhi</option></select></div>
     </div>
     <div class="ir">
       <div class="fg"><label>Holat</label><select id="eu-status"><option value="active">✅ Aktiv</option><option value="blocked">🚫 Bloklangan</option></select></div>
@@ -1017,7 +1058,13 @@ async function loadUsers() {
 
 function openEditUser(u) {
   document.getElementById('eu-id').value=u.id;
-  document.getElementById('eu-name').value=u.name;
+  document.getElementById('eu-name').value=u.name||'';
+  // Ism qismlarini ajratib ko'rsatish
+  const parts = (u.name||'').split(' ');
+  document.getElementById('eu-surname').value=u.surname||parts[0]||'';
+  document.getElementById('eu-firstname').value=u.firstname||parts[1]||'';
+  document.getElementById('eu-middlename').value=u.middlename||parts[2]||'';
+  document.getElementById('eu-jshshir').value=u.jshshir||'';
   document.getElementById('eu-pos').value=u.position||'';
   document.getElementById('eu-pass').value='';
   document.getElementById('eu-phone').value=u.phone||'';
@@ -1031,11 +1078,19 @@ function openEditUser(u) {
 async function saveEditUser() {
   if (ME.role!=='admin') { showToast('❌ Ruxsat yo\'q'); return; }
   const id = document.getElementById('eu-id').value;
+  const eu_surname = document.getElementById('eu-surname').value.trim();
+  const eu_firstname = document.getElementById('eu-firstname').value.trim();
+  const eu_middlename = document.getElementById('eu-middlename').value.trim();
+  const eu_fullname = [eu_surname, eu_firstname, eu_middlename].filter(Boolean).join(' ');
   const body = {
-    name:document.getElementById('eu-name').value,
+    name: eu_fullname||document.getElementById('eu-name').value,
+    surname: eu_surname,
+    firstname: eu_firstname,
+    middlename: eu_middlename,
+    jshshir: document.getElementById('eu-jshshir').value.trim(),
     position:document.getElementById('eu-pos').value,
     group_name:document.getElementById('eu-group').value,
-    role:document.getElementById('eu-role').value,
+    role:document.getElementById('eu-role').value||'worker',
     status:document.getElementById('eu-status').value,
     phone:document.getElementById('eu-phone').value,
   };
@@ -1055,16 +1110,24 @@ async function deleteUser(id, name) {
 }
 
 async function addUser() {
+  const surname = document.getElementById('nu-surname').value.trim();
+  const firstname = document.getElementById('nu-firstname').value.trim();
+  const middlename = document.getElementById('nu-middlename').value.trim();
+  const fullname = [surname, firstname, middlename].filter(Boolean).join(' ');
   const body = {
-    name:document.getElementById('nu-name').value,
+    name: fullname,
+    surname: surname,
+    firstname: firstname,
+    middlename: middlename,
+    jshshir: document.getElementById('nu-jshshir').value.trim(),
     email:document.getElementById('nu-email').value,
     password:document.getElementById('nu-pass').value,
-    role:document.getElementById('nu-role').value,
+    role:document.getElementById('nu-role').value||'worker',
     position:document.getElementById('nu-pos').value,
     group_name:document.getElementById('nu-group').value,
     phone:document.getElementById('nu-phone').value,
   };
-  if (!body.name||!body.email||!body.password) { showToast('❌ Ism, email, parol kerak!'); return; }
+  if (!surname||!firstname||!body.email||!body.password) { showToast('❌ Familiya, ism, email, parol kerak!'); return; }
   const res = await api('POST', '/users', body);
   if (res.error) { showToast('❌ '+res.error); return; }
   closeModal('addUserModal'); showToast('✅ Xodim qo\'shildi!'); loadUsers(); loadUserDropdown();
