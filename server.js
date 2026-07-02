@@ -274,7 +274,7 @@ async function initDB() {
       ? new SQL.Database(fs.readFileSync(DB_FILE))
       : new SQL.Database();
 
-    run(`CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, email TEXT UNIQUE, password TEXT, role TEXT DEFAULT 'worker', position TEXT, group_name TEXT, phone TEXT, status TEXT DEFAULT 'active', created_at TEXT)`);
+    run(`CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, surname TEXT, firstname TEXT, middlename TEXT, jshshir TEXT, email TEXT UNIQUE, password TEXT, role TEXT DEFAULT 'worker', position TEXT, group_name TEXT, phone TEXT, status TEXT DEFAULT 'active', created_at TEXT)`);
     run(`CREATE TABLE IF NOT EXISTS attendance (id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INTEGER, check_in TEXT, check_out TEXT, check_in_lat REAL, check_in_lng REAL, location_name TEXT, date TEXT, work_hours REAL DEFAULT 0, status TEXT DEFAULT 'present')`);
     run(`CREATE TABLE IF NOT EXISTS tasks (id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT, description TEXT, assigned_to INTEGER, created_by INTEGER, priority TEXT DEFAULT 'medium', status TEXT DEFAULT 'pending', location TEXT, location_lat REAL, location_lng REAL, deadline TEXT, completed_at TEXT, created_at TEXT)`);
     run(`CREATE TABLE IF NOT EXISTS task_proofs (id INTEGER PRIMARY KEY AUTOINCREMENT, task_id INTEGER, user_id INTEGER, image_url TEXT, comment TEXT, latitude REAL, longitude REAL, distance_to_task REAL, submitted_at TEXT)`);
@@ -291,6 +291,12 @@ async function initDB() {
       ].forEach(u => run('INSERT OR IGNORE INTO users (name,email,password,role,position,group_name,created_at) VALUES (?,?,?,?,?,?,?)', [...u, nowUZ()]));
       console.log('Demo foydalanuvchilar yaratildi');
     }
+
+    // Eski DB ga yangi ustunlar qo'shish (mavjud bo'lmasa)
+    try { run('ALTER TABLE users ADD COLUMN surname TEXT DEFAULT ""'); } catch(e) {}
+    try { run('ALTER TABLE users ADD COLUMN firstname TEXT DEFAULT ""'); } catch(e) {}
+    try { run('ALTER TABLE users ADD COLUMN middlename TEXT DEFAULT ""'); } catch(e) {}
+    try { run('ALTER TABLE users ADD COLUMN jshshir TEXT DEFAULT ""'); } catch(e) {}
 
     dbReady = true;
     console.log('✅ DB tayyor!');
