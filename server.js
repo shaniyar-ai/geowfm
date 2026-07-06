@@ -94,6 +94,7 @@ app.post('/api/auth/login', requireDb, (req, res) => {
     if (!u || !bcrypt.compareSync(password, u.password))
       return res.status(401).json({ error: 'Email yoki parol noto\'g\'ri' });
     if (u.status === 'blocked') return res.status(403).json({ error: 'Akkaunt bloklangan' });
+    if (u.status === 'pending') return res.status(403).json({ error: 'Akkauntingiz hali tasdiqlanmagan. Admin tasdiqlashini kuting.' });
     const token = jwt.sign(
       { id:u.id, email:u.email, role:u.role, name:u.name, group:u.group_name },
       SECRET, { expiresIn:'24h' }
@@ -274,7 +275,7 @@ async function initDB() {
       ? new SQL.Database(fs.readFileSync(DB_FILE))
       : new SQL.Database();
 
-    run(`CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, surname TEXT, firstname TEXT, middlename TEXT, jshshir TEXT, email TEXT UNIQUE, password TEXT, role TEXT DEFAULT 'worker', position TEXT, group_name TEXT, phone TEXT, status TEXT DEFAULT 'active', created_at TEXT)`);
+    run(`CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, surname TEXT, firstname TEXT, middlename TEXT, jshshir TEXT, passport_id TEXT, face_photo TEXT, email TEXT UNIQUE, password TEXT, role TEXT DEFAULT 'worker', position TEXT, group_name TEXT, phone TEXT, status TEXT DEFAULT 'active', created_at TEXT)`);
     run(`CREATE TABLE IF NOT EXISTS attendance (id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INTEGER, check_in TEXT, check_out TEXT, check_in_lat REAL, check_in_lng REAL, location_name TEXT, date TEXT, work_hours REAL DEFAULT 0, status TEXT DEFAULT 'present')`);
     run(`CREATE TABLE IF NOT EXISTS tasks (id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT, description TEXT, assigned_to INTEGER, created_by INTEGER, priority TEXT DEFAULT 'medium', status TEXT DEFAULT 'pending', location TEXT, location_lat REAL, location_lng REAL, deadline TEXT, completed_at TEXT, created_at TEXT)`);
     run(`CREATE TABLE IF NOT EXISTS task_proofs (id INTEGER PRIMARY KEY AUTOINCREMENT, task_id INTEGER, user_id INTEGER, image_url TEXT, comment TEXT, latitude REAL, longitude REAL, distance_to_task REAL, submitted_at TEXT)`);
@@ -297,6 +298,8 @@ async function initDB() {
     try { run('ALTER TABLE users ADD COLUMN firstname TEXT DEFAULT ""'); } catch(e) {}
     try { run('ALTER TABLE users ADD COLUMN middlename TEXT DEFAULT ""'); } catch(e) {}
     try { run('ALTER TABLE users ADD COLUMN jshshir TEXT DEFAULT ""'); } catch(e) {}
+    try { run('ALTER TABLE users ADD COLUMN passport_id TEXT DEFAULT ""'); } catch(e) {}
+    try { run('ALTER TABLE users ADD COLUMN face_photo TEXT DEFAULT ""'); } catch(e) {}
 
     dbReady = true;
     console.log('✅ DB tayyor!');
