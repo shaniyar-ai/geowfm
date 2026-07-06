@@ -309,9 +309,135 @@ tr:hover td{background:var(--hover);}
     <div class="fg"><label>Parol</label><input type="password" id="lPass" placeholder="Parol" onkeydown="if(event.key==='Enter')doLogin()"></div>
     <button class="btn-login" onclick="doLogin()">Kirish →</button>
     <div class="err-msg" id="loginErr">Email yoki parol noto'g'ri!</div>
+    <div style="text-align:center;margin-top:16px;font-size:13px;color:var(--text2)">
+      Akkauntingiz yo'qmi? 
+      <span onclick="showRegister()" style="color:var(--accent);cursor:pointer;font-weight:600">Ro'yxatdan o'tish →</span>
+    </div>
 
   </div>
 </div>
+
+
+<!-- REGISTER PAGE -->
+<div id="registerPage" style="display:none;min-height:100vh;align-items:center;justify-content:center;background:radial-gradient(ellipse at 20% 20%,rgba(37,99,235,.12),transparent 50%),radial-gradient(ellipse at 80% 80%,rgba(124,58,237,.10),transparent 50%),var(--bg);">
+  <div style="background:var(--surface);border:1.5px solid var(--border);border-radius:24px;padding:36px;width:520px;max-width:95vw;box-shadow:var(--shadow2);animation:slideUp .5s ease;">
+    
+    <!-- STEP INDICATOR -->
+    <div style="display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:28px">
+      <div class="reg-step active" id="step-dot-1">1</div>
+      <div style="width:40px;height:2px;background:var(--border)" id="step-line-1"></div>
+      <div class="reg-step" id="step-dot-2">2</div>
+      <div style="width:40px;height:2px;background:var(--border)" id="step-line-2"></div>
+      <div class="reg-step" id="step-dot-3">3</div>
+    </div>
+
+    <!-- STEP 1: Shaxsiy ma'lumotlar -->
+    <div id="reg-step1">
+      <h2 style="font-family:'Syne',sans-serif;font-size:20px;font-weight:800;margin-bottom:6px">📋 Shaxsiy ma'lumotlar</h2>
+      <p style="color:var(--text2);font-size:13px;margin-bottom:20px">1-qadam: Ism va hujjat ma'lumotlari</p>
+      <div class="ir">
+        <div class="fg"><label>Familiya *</label><input type="text" id="reg-surname" placeholder="Familiyangiz"></div>
+        <div class="fg"><label>Ism *</label><input type="text" id="reg-firstname" placeholder="Ismingiz"></div>
+      </div>
+      <div class="fg"><label>Sharif (otasining ismi)</label><input type="text" id="reg-middlename" placeholder="Sharifingiz"></div>
+      <div class="fg">
+        <label>Hujjat turi *</label>
+        <select id="reg-doc-type" onchange="updateDocPlaceholder()">
+          <option value="jshshir">JSHSHIR (14 raqam)</option>
+          <option value="passport">Pasport ID (AA1234567)</option>
+        </select>
+      </div>
+      <div class="fg"><label id="reg-doc-label">JSHSHIR *</label><input type="text" id="reg-doc-number" placeholder="14 raqamli JSHSHIR" maxlength="14"></div>
+      <div class="fg">
+        <label>Guruh *</label>
+        <select id="reg-group">
+          <option value="">Guruhni tanlang...</option>
+          <option>Magistral Transport tarmog'i guruhi</option>
+          <option>Nurafshon LKX guruhi</option>
+          <option>Bo'ka LKX guruhi</option>
+          <option>Zafar LKX guruhi</option>
+          <option>Bekobod LKX guruhi</option>
+          <option>Oqqo'rg'on LKX guruhi</option>
+          <option>TX va P guruhi</option>
+          <option>Moddiy va ombor hisobi guruhi</option>
+        </select>
+      </div>
+      <div class="fg">
+        <label>Lavozim *</label>
+        <select id="reg-position">
+          <option value="">Lavozimni tanlang...</option>
+          <option>Bosh muhandis</option>
+          <option>Oliy toifali muhandis</option>
+          <option>Yetakchi muhandis</option>
+          <option>Guruh boshlig'i</option>
+          <option>1-toifali muhandis</option>
+          <option>2-toifali muhandis</option>
+          <option>Elektromontyor</option>
+        </select>
+      </div>
+      <div class="fg"><label>Telefon</label><input type="tel" id="reg-phone" placeholder="+998 90 000 00 00"></div>
+      <div class="err-msg" id="reg-err1" style="display:none;background:rgba(220,38,38,.08);padding:10px;border-radius:8px;margin-top:10px"></div>
+      <button class="btn-login" onclick="regStep1Next()" style="margin-top:16px">Keyingi →</button>
+      <div style="text-align:center;margin-top:14px;font-size:13px;color:var(--text2)">
+        Akkauntingiz bormi? <span onclick="showLogin()" style="color:var(--accent);cursor:pointer;font-weight:600">Kirish →</span>
+      </div>
+    </div>
+
+    <!-- STEP 2: Login va parol -->
+    <div id="reg-step2" style="display:none">
+      <h2 style="font-family:'Syne',sans-serif;font-size:20px;font-weight:800;margin-bottom:6px">🔑 Login yaratish</h2>
+      <p style="color:var(--text2);font-size:13px;margin-bottom:20px">2-qadam: Email va parol o'rnating</p>
+      <div class="fg"><label>Email *</label><input type="email" id="reg-email" placeholder="email@geo.uz"></div>
+      <div class="fg"><label>Parol *</label><input type="password" id="reg-pass" placeholder="Kamida 6 belgi"></div>
+      <div class="fg"><label>Parolni tasdiqlang *</label><input type="password" id="reg-pass2" placeholder="Parolni qayta kiriting"></div>
+      <div class="err-msg" id="reg-err2" style="display:none;background:rgba(220,38,38,.08);padding:10px;border-radius:8px;margin-top:10px"></div>
+      <div style="display:flex;gap:10px;margin-top:16px">
+        <button class="btn btn-s" onclick="regGoStep(1)" style="flex:1;padding:14px">← Orqaga</button>
+        <button class="btn-login" onclick="regStep2Next()" style="flex:2;margin-top:0">Keyingi →</button>
+      </div>
+    </div>
+
+    <!-- STEP 3: Face control -->
+    <div id="reg-step3" style="display:none">
+      <h2 style="font-family:'Syne',sans-serif;font-size:20px;font-weight:800;margin-bottom:6px">📸 Yuz rasmi</h2>
+      <p style="color:var(--text2);font-size:13px;margin-bottom:20px">3-qadam: Kameraga yuzingizni ko'rsating</p>
+      
+      <div style="position:relative;border-radius:16px;overflow:hidden;background:#000;margin-bottom:16px;aspect-ratio:4/3">
+        <video id="reg-camera" autoplay playsinline style="width:100%;height:100%;object-fit:cover"></video>
+        <canvas id="reg-canvas" style="display:none"></canvas>
+        <!-- Yuz chizig'i ko'rsatgich -->
+        <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none">
+          <div style="width:180px;height:220px;border:3px solid rgba(37,99,235,.8);border-radius:50%;box-shadow:0 0 0 2000px rgba(0,0,0,.3)"></div>
+        </div>
+        <div style="position:absolute;bottom:12px;left:0;right:0;text-align:center;color:#fff;font-size:13px;font-weight:600">
+          Yuzingizni doira ichiga joylashtiring
+        </div>
+      </div>
+
+      <div id="reg-photo-preview" style="display:none;margin-bottom:16px">
+        <img id="reg-photo-img" style="width:100%;border-radius:12px;max-height:200px;object-fit:cover">
+        <div style="text-align:center;margin-top:8px">
+          <button class="btn btn-s" onclick="retakePhoto()">🔄 Qayta olish</button>
+        </div>
+      </div>
+
+      <div class="err-msg" id="reg-err3" style="display:none;background:rgba(220,38,38,.08);padding:10px;border-radius:8px;margin-top:10px"></div>
+      
+      <div style="display:flex;gap:10px;margin-top:16px">
+        <button class="btn btn-s" onclick="regGoStep(2);stopCamera()" style="flex:1;padding:14px">← Orqaga</button>
+        <button class="btn-login" id="reg-photo-btn" onclick="takePhoto()" style="flex:2;margin-top:0">📸 Rasm olish</button>
+      </div>
+      <button class="btn-login" id="reg-submit-btn" onclick="submitRegister()" style="display:none;margin-top:10px;background:linear-gradient(135deg,var(--success),#059669)">✅ Ro'yxatdan o'tish</button>
+    </div>
+
+  </div>
+</div>
+
+<style>
+.reg-step{width:32px;height:32px;border-radius:50%;background:var(--surface2);border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:var(--text2);transition:all .3s;}
+.reg-step.active{background:var(--accent);border-color:var(--accent);color:#fff;}
+.reg-step.done{background:var(--success);border-color:var(--success);color:#fff;}
+</style>
 
 <button class="mob-toggle" onclick="document.getElementById('sidebar').classList.toggle('open')">☰</button>
 
@@ -1598,6 +1724,210 @@ function showToast(msg){
   const t=document.getElementById('toast');
   t.textContent=msg;t.style.display='block';
   clearTimeout(toastT);toastT=setTimeout(()=>t.style.display='none',3500);
+}
+
+
+// ═══ RO'YXATDAN O'TISH ═══
+let regData = {};
+let cameraStream = null;
+let photoTaken = false;
+
+function showRegister() {
+  document.getElementById('loginPage').style.display = 'none';
+  document.getElementById('registerPage').style.display = 'flex';
+  regGoStep(1);
+}
+
+function showLogin() {
+  stopCamera();
+  document.getElementById('registerPage').style.display = 'none';
+  document.getElementById('loginPage').style.display = 'flex';
+}
+
+function updateDocPlaceholder() {
+  const type = document.getElementById('reg-doc-type').value;
+  const label = document.getElementById('reg-doc-label');
+  const input = document.getElementById('reg-doc-number');
+  if (type === 'jshshir') {
+    label.textContent = 'JSHSHIR *';
+    input.placeholder = '14 raqamli JSHSHIR';
+    input.maxLength = 14;
+  } else {
+    label.textContent = 'Pasport ID *';
+    input.placeholder = 'AA1234567';
+    input.maxLength = 9;
+  }
+  input.value = '';
+}
+
+function regGoStep(step) {
+  [1,2,3].forEach(i => {
+    document.getElementById('reg-step'+i).style.display = i===step ? 'block' : 'none';
+    const dot = document.getElementById('step-dot-'+i);
+    if (i < step) { dot.className = 'reg-step done'; dot.textContent = '✓'; }
+    else if (i === step) { dot.className = 'reg-step active'; dot.textContent = i; }
+    else { dot.className = 'reg-step'; dot.textContent = i; }
+  });
+  [1,2].forEach(i => {
+    const line = document.getElementById('step-line-'+i);
+    if (line) line.style.background = i < step ? 'var(--accent)' : 'var(--border)';
+  });
+  if (step === 3) startCamera();
+}
+
+function regStep1Next() {
+  const surname = document.getElementById('reg-surname').value.trim();
+  const firstname = document.getElementById('reg-firstname').value.trim();
+  const docNum = document.getElementById('reg-doc-number').value.trim();
+  const group = document.getElementById('reg-group').value;
+  const position = document.getElementById('reg-position').value;
+  const errEl = document.getElementById('reg-err1');
+
+  if (!surname || !firstname) { errEl.textContent = '❌ Familiya va ism kiritish majburiy!'; errEl.style.display='block'; return; }
+  if (!docNum) { errEl.textContent = '❌ JSHSHIR yoki Pasport ID kiritish majburiy!'; errEl.style.display='block'; return; }
+  if (!group) { errEl.textContent = '❌ Guruhni tanlang!'; errEl.style.display='block'; return; }
+  if (!position) { errEl.textContent = '❌ Lavozimni tanlang!'; errEl.style.display='block'; return; }
+
+  const docType = document.getElementById('reg-doc-type').value;
+  if (docType === 'jshshir' && (!/^\d{14}$/.test(docNum))) {
+    errEl.textContent = '❌ JSHSHIR 14 raqamdan iborat bo'lishi kerak!'; errEl.style.display='block'; return;
+  }
+
+  errEl.style.display = 'none';
+  regData.surname = surname;
+  regData.firstname = firstname;
+  regData.middlename = document.getElementById('reg-middlename').value.trim();
+  regData.docType = docType;
+  regData.docNumber = docNum;
+  regData.jshshir = docType === 'jshshir' ? docNum : '';
+  regData.passport = docType === 'passport' ? docNum : '';
+  regData.group = group;
+  regData.position = position;
+  regData.phone = document.getElementById('reg-phone').value.trim();
+  regData.name = [surname, firstname, regData.middlename].filter(Boolean).join(' ');
+  regGoStep(2);
+}
+
+function regStep2Next() {
+  const email = document.getElementById('reg-email').value.trim();
+  const pass = document.getElementById('reg-pass').value;
+  const pass2 = document.getElementById('reg-pass2').value;
+  const errEl = document.getElementById('reg-err2');
+
+  if (!email || !email.includes('@')) { errEl.textContent = '❌ To'g'ri email kiriting!'; errEl.style.display='block'; return; }
+  if (pass.length < 6) { errEl.textContent = '❌ Parol kamida 6 belgidan iborat bo'lishi kerak!'; errEl.style.display='block'; return; }
+  if (pass !== pass2) { errEl.textContent = '❌ Parollar mos kelmaydi!'; errEl.style.display='block'; return; }
+
+  errEl.style.display = 'none';
+  regData.email = email;
+  regData.password = pass;
+  regGoStep(3);
+}
+
+async function startCamera() {
+  photoTaken = false;
+  document.getElementById('reg-photo-btn').style.display = 'block';
+  document.getElementById('reg-submit-btn').style.display = 'none';
+  document.getElementById('reg-photo-preview').style.display = 'none';
+  document.getElementById('reg-camera').style.display = 'block';
+  try {
+    cameraStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user', width:640, height:480 }, audio: false });
+    document.getElementById('reg-camera').srcObject = cameraStream;
+  } catch(e) {
+    document.getElementById('reg-err3').textContent = '❌ Kameraga ruxsat bering! Sozlamalarda kamera ruxsatini yoqing.';
+    document.getElementById('reg-err3').style.display = 'block';
+  }
+}
+
+function stopCamera() {
+  if (cameraStream) {
+    cameraStream.getTracks().forEach(t => t.stop());
+    cameraStream = null;
+  }
+}
+
+function takePhoto() {
+  const video = document.getElementById('reg-camera');
+  const canvas = document.getElementById('reg-canvas');
+  canvas.width = video.videoWidth || 640;
+  canvas.height = video.videoHeight || 480;
+  canvas.getContext('2d').drawImage(video, 0, 0);
+  const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
+  regData.facePhoto = dataUrl;
+  photoTaken = true;
+
+  document.getElementById('reg-photo-img').src = dataUrl;
+  document.getElementById('reg-photo-preview').style.display = 'block';
+  document.getElementById('reg-camera').style.display = 'none';
+  document.getElementById('reg-photo-btn').style.display = 'none';
+  document.getElementById('reg-submit-btn').style.display = 'block';
+  stopCamera();
+}
+
+function retakePhoto() {
+  photoTaken = false;
+  document.getElementById('reg-photo-preview').style.display = 'none';
+  document.getElementById('reg-submit-btn').style.display = 'none';
+  document.getElementById('reg-photo-btn').style.display = 'block';
+  document.getElementById('reg-camera').style.display = 'block';
+  startCamera();
+}
+
+async function submitRegister() {
+  const btn = document.getElementById('reg-submit-btn');
+  const errEl = document.getElementById('reg-err3');
+  if (!photoTaken || !regData.facePhoto) {
+    errEl.textContent = '❌ Avval rasmingizni oling!'; errEl.style.display='block'; return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = '⏳ Yuklanmoqda...';
+
+  // Rasmni ImgBB ga yuklash
+  let faceUrl = '';
+  try {
+    const base64 = regData.facePhoto.split(',')[1];
+    const formData = new FormData();
+    formData.append('image', base64);
+    formData.append('key', '3a4c5bc8792b94267c256baf1d486157');
+    const r = await fetch('https://api.imgbb.com/1/upload', { method:'POST', body:formData });
+    const d = await r.json();
+    if (d.success) faceUrl = d.data.url;
+  } catch(e) { console.log('Rasm yuklanmadi, davom etamiz'); }
+
+  // Serverga yuborish
+  const res = await api('POST', '/auth/register', {
+    name: regData.name,
+    surname: regData.surname,
+    firstname: regData.firstname,
+    middlename: regData.middlename,
+    jshshir: regData.jshshir,
+    passport_id: regData.passport,
+    email: regData.email,
+    password: regData.password,
+    group_name: regData.group,
+    position: regData.position,
+    phone: regData.phone,
+    face_photo: faceUrl,
+    role: 'worker',
+    status: 'pending',
+  });
+
+  if (res.error) {
+    errEl.textContent = '❌ ' + res.error;
+    errEl.style.display = 'block';
+    btn.disabled = false;
+    btn.textContent = '✅ Ro'yxatdan o'tish';
+    return;
+  }
+
+  // Muvaffaqiyatli
+  stopCamera();
+  document.getElementById('registerPage').style.display = 'none';
+  document.getElementById('loginPage').style.display = 'flex';
+  document.getElementById('loginErr').style.color = 'var(--success)';
+  document.getElementById('loginErr').textContent = '✅ Ro'yxatdan o'tdingiz! Admin tasdiqlashini kuting.';
+  document.getElementById('loginErr').style.display = 'block';
 }
 
 if(TOKEN&&ME){initApp();}else{updateDate();}
