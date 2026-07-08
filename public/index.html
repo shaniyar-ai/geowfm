@@ -807,13 +807,12 @@ tr:hover td{background:var(--hover);}
 
 <script>
 // ═══ CONFIG ═══
-let API = localStorage.getItem('apiUrl') || (location.origin + '/api');
+let API = localStorage.getItem('apiUrl') || 'https://geowfm-production.up.railway.app/api';
 let TOKEN = localStorage.getItem('token') || '';
 let ME = JSON.parse(localStorage.getItem('me') || 'null');
 let checkedIn = false, clockInt = null;
 let taskMap = null, taskMarker = null, taskCircle = null;
 let currentProofLat = null, currentProofLng = null, currentTaskData = null;
-let usersCache = [];
 
 // ═══ THEME ═══
 function toggleTheme() {
@@ -1164,29 +1163,23 @@ async function loadUsers() {
   const users = await api('GET', '/users');
   const el = document.getElementById('userTableWrap');
   if (users.error||!users.length) { el.innerHTML='<div class="empty">'+(users.error||'Xodim yo\'q')+'</div>'; return; }
-  usersCache = users;
   const canEdit = ME.role==='admin';
   el.innerHTML = `<table>
-    <thead><tr><th>Xodim</th><th>Guruh</th><th>Telefon</th><th>Holat</th>${canEdit?'<th>Amallar</th>':''}</tr></thead>
+    <thead><tr><th>Xodim</th><th>Rol</th><th>Guruh</th><th>Telefon</th><th>Holat</th>${canEdit?'<th>Amallar</th>':''}</tr></thead>
     <tbody>${users.map((u,i)=>`<tr>
       <td><div style="display:flex;align-items:center;gap:10px">
         <div class="uav ${avColor(i)}" style="width:34px;height:34px;font-size:13px">${(u.name||'?')[0]}</div>
         <div><div style="font-weight:600">${u.name}</div><div style="font-size:11px;color:var(--text2)">${u.email}</div></div>
       </div></td>
+      <td><span class="badge ${u.role==='admin'?'ra':u.role==='supervisor'?'rs':'rw'}">${ROLE_LABELS[u.role]||u.role}</span></td>
       <td>${u.group_name||'—'}</td>
       <td>${u.phone||'—'}</td>
       <td><span class="badge ${u.status==='active'?'success':'danger'}">${u.status==='active'?'● Aktiv':'● Bloklangan'}</span></td>
       ${canEdit?`<td><div style="display:flex;gap:6px">
-        <button class="btn btn-warn" onclick="openEditUserById(${u.id})">✏️</button>
-        ${u.role!=='admin'?`<button class="btn btn-del" onclick="deleteUser(${u.id})">🗑️</button>`:''}
+        <button class="btn btn-warn" onclick='openEditUser(${JSON.stringify(u)})'>✏️</button>
+        ${u.role!=='admin'?`<button class="btn btn-del" onclick="deleteUser(${u.id},'${u.name}')">🗑️</button>`:''}
       </div></td>`:''}
     </tr>`).join('')}</tbody></table>`;
-}
-
-function openEditUserById(id) {
-  const u = usersCache.find(x => String(x.id) === String(id));
-  if (!u) { showToast('❌ Xodim topilmadi'); return; }
-  openEditUser(u);
 }
 
 function openEditUser(u) {
@@ -1201,7 +1194,7 @@ function openEditUser(u) {
   document.getElementById('eu-pos').value=u.position||'';
   document.getElementById('eu-pass').value='';
   document.getElementById('eu-phone').value=u.phone||'';
-  document.getElementById('eu-role').value = u.role || 'worker';
+  [...document.getElementById('eu-role').options].forEach(o=>o.selected=o.value===u.role);
   [...document.getElementById('eu-group').options].forEach(o=>o.selected=o.text===u.group_name);
   [...document.getElementById('eu-status').options].forEach(o=>o.selected=o.value===u.status);
   document.getElementById('euSaveBtn').style.display = ME.role==='admin'?'flex':'none';
@@ -1234,10 +1227,8 @@ async function saveEditUser() {
   closeModal('editUserModal'); showToast('✅ Yangilandi!'); loadUsers();
 }
 
-async function deleteUser(id) {
+async function deleteUser(id, name) {
   if (ME.role!=='admin') { showToast('❌ Ruxsat yo\'q'); return; }
-  const u = usersCache.find(x => String(x.id) === String(id));
-  const name = u?.name || 'Xodim';
   if (!confirm('"'+name+'" ni o\'chirishni tasdiqlaysizmi?')) return;
   const res = await api('DELETE', '/users/'+id);
   if (res.error) { showToast('❌ '+res.error); return; }
@@ -1799,7 +1790,7 @@ function regStep1Next() {
 
   const docType = document.getElementById('reg-doc-type').value;
   if (docType === 'jshshir' && (!/^\d{14}$/.test(docNum))) {
-    errEl.textContent = "❌ JSHSHIR 14 raqamdan iborat bo'lishi kerak!"; errEl.style.display='block'; return;
+    errEl.textContent = '❌ JSHSHIR 14 raqamdan iborat bo'lishi kerak!'; errEl.style.display='block'; return;
   }
 
   errEl.style.display = 'none';
@@ -1823,8 +1814,8 @@ function regStep2Next() {
   const pass2 = document.getElementById('reg-pass2').value;
   const errEl = document.getElementById('reg-err2');
 
-  if (!email || !email.includes('@')) { errEl.textContent = "❌ To'g'ri email kiriting!"; errEl.style.display='block'; return; }
-  if (pass.length < 6) { errEl.textContent = "❌ Parol kamida 6 belgidan iborat bo'lishi kerak!"; errEl.style.display='block'; return; }
+  if (!email || !email.includes('@')) { errEl.textContent = '❌ To'g'ri email kiriting!'; errEl.style.display='block'; return; }
+  if (pass.length < 6) { errEl.textContent = '❌ Parol kamida 6 belgidan iborat bo'lishi kerak!'; errEl.style.display='block'; return; }
   if (pass !== pass2) { errEl.textContent = '❌ Parollar mos kelmaydi!'; errEl.style.display='block'; return; }
 
   errEl.style.display = 'none';
@@ -1926,7 +1917,7 @@ async function submitRegister() {
     errEl.textContent = '❌ ' + res.error;
     errEl.style.display = 'block';
     btn.disabled = false;
-    btn.textContent = "✅ Ro'yxatdan o'tish";
+    btn.textContent = '✅ Ro'yxatdan o'tish';
     return;
   }
 
@@ -1935,7 +1926,7 @@ async function submitRegister() {
   document.getElementById('registerPage').style.display = 'none';
   document.getElementById('loginPage').style.display = 'flex';
   document.getElementById('loginErr').style.color = 'var(--success)';
-  document.getElementById('loginErr').textContent = "✅ Ro'yxatdan o'tdingiz! Admin tasdiqlashini kuting.";
+  document.getElementById('loginErr').textContent = '✅ Ro'yxatdan o'tdingiz! Admin tasdiqlashini kuting.';
   document.getElementById('loginErr').style.display = 'block';
 }
 
